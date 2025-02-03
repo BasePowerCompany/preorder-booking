@@ -172,121 +172,118 @@
         gtag("event", "address-submit", { leadType, addressData, zipConfig });
         window.hubspotAddressData = addressData;
 
-        // Initialize market status
-var marketStatus = "unavailable";
+    // Initialize market status
+    var marketStatus = "unavailable";
 
-try {
-  // Fetch the updated deregulated zip codes CSV
-  const response = await fetch("https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips-01-29-2025.csv");
-  const csvText = await response.text();
-  const lines = csvText.split("\n");
+    try {
+      // Fetch the updated deregulated zip codes CSV
+      const response = await fetch("https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips-01-29-2025.csv");
+      const csvText = await response.text();
+      const lines = csvText.split("\n");
 
-  // Check for matching zip and get status
-  lines.slice(1).some((line) => {
-    const columns = line.split(",");
-    if (columns[1]?.trim() === addressData?.postalCode?.trim()?.substring(0, 5)) {
-      if (columns[4]?.trim() === "yes") {
-        marketStatus = "available";
-        return true;
-      } else if (columns[4]?.trim() === "soon") {
-        marketStatus = "soon";
-        return true;
-      }
-    }
-    return false;
-  });
-} catch (error) {
-  console.error("Error checking zip code:", error);
-  marketStatus = "unavailable";
-}
-
-if (optibaseSendConversionEvent) {
-  optibaseSendConversionEvent("user_submit_address_form");
-}
-
-if (posthog) {
-  posthog.capture("user-submit-address-form");
-
-  // Maybe redirect to sign-up form
-  if (redirectToSignupForm) {
-    if (useTypeformSignUp && (marketStatus === "available" || marketStatus === "soon")) {
-      var signUpFormURL = `https://basepowercompany.com/${marketStatus === "available" ? "join-now" : "join-now-htx"}`;
-      var currentParams = new URLSearchParams(window.location.search);
-      var url = new URL(signUpFormURL);
-
-      var selectedParams = {
-        gclid: currentParams.get("gclid"),
-        utm_source: currentParams.get("utm_source"),
-        utm_medium: currentParams.get("utm_medium"),
-        utm_campaign: currentParams.get("utm_campaign"),
-        utm_term: currentParams.get("utm_term"),
-        utm_content: currentParams.get("utm_content"),
-        referrer_name: currentParams.get("referrer_name"),
-        person_id: posthog.get_distinct_id(),
-        title: addressData?.title || "",
-        formatted_address: addressData?.formattedAddress || "",
-        external_id: addressData?.externalId || "",
-        external_url: addressData?.externalUrl || "",
-        house_number: addressData?.houseNumber || "",
-        street: addressData?.street || "",
-        street_address: `${addressData?.houseNumber || ""} ${addressData?.street || ""}`.trim(),
-        street_2: addressData?.street_2 || "",
-        city: addressData?.city || "",
-        county: addressData?.county || "",
-        state_short: addressData?.stateShort || "",
-        state_long: addressData?.stateLong || "",
-        country_code: addressData?.countryCode || "",
-        country_long: addressData?.countryLong || "",
-        postal_code: addressData?.postalCode || "",
-      };
-
-      var filteredParams = {};
-      Object.entries(selectedParams).forEach(([k, v]) => {
-        if (v) {
-          filteredParams[k] = v;
-        }
-      });
-
-      var params = new URLSearchParams(filteredParams).toString();
-      url.search = params;
-      window.location.href = url.toString();
-      return;
-      
-            }
-
-            var signUpFormURL = "https://join.basepowercompany.com/";
-            var url = new URL(signUpFormURL);
-            var currentParams = new URLSearchParams(window.location.search);
-
-            var selectedParams = {
-              // google ads tracking params
-              gclid: currentParams.get("gclid"),
-              utm_source: currentParams.get("utm_source"),
-              utm_medium: currentParams.get("utm_medium"),
-              utm_campaign: currentParams.get("utm_campaign"),
-              utm_term: currentParams.get("utm_term"),
-              utm_content: currentParams.get("utm_content"),
-              // Referral link
-              referrer_name: currentParams.get("referrer_name"),
-              // Address form data we re-use on sign-up form
-              addressData: JSON.stringify(addressData),
-            };
-
-            var filteredParams = {};
-            Object.entries(selectedParams).forEach(([k, v]) => {
-              if (v) {
-                filteredParams[k] = v;
-              }
-            });
-
-            url.search = new URLSearchParams(filteredParams).toString();
-
-            window.location.href = url.toString();
-
-            return;
+      // Check for matching zip and get status
+      lines.slice(1).some((line) => {
+        const columns = line.split(",");
+        if (columns[1]?.trim() === addressData?.postalCode?.trim()?.substring(0, 5)) {
+          if (columns[4]?.trim() === "yes") {
+            marketStatus = "available";
+            return true;
+          } else if (columns[4]?.trim() === "soon") {
+            marketStatus = "soon";
+            return true;
+          } else if (columns[4]?.trim() === "membership") {
+            marketStatus = "membership";
+            return true;
           }
-          posthog.capture("user-sees-hubspot-form");
         }
+        return false;
+      });
+    } catch (error) {
+      console.error("Error checking zip code:", error);
+      marketStatus = "unavailable";
+    }
+
+    if (optibaseSendConversionEvent) {
+      optibaseSendConversionEvent("user_submit_address_form");
+    }
+
+    if (posthog) {
+      posthog.capture("user-submit-address-form");
+
+      // Maybe redirect to sign-up form
+      if (redirectToSignupForm) {
+        if (useTypeformSignUp && (marketStatus === "available" || marketStatus === "soon" || marketStatus === "membership")) {
+          var signUpFormURL = `https://basepowercompany.com/${marketStatus === "available" ? "join-now" : marketStatus === "soon" ? "join-now-htx" : "join-now-lp"}`;
+          var currentParams = new URLSearchParams(window.location.search);
+          var url = new URL(signUpFormURL);
+
+          var selectedParams = {
+            gclid: currentParams.get("gclid"),
+            utm_source: currentParams.get("utm_source"),
+            utm_medium: currentParams.get("utm_medium"),
+            utm_campaign: currentParams.get("utm_campaign"),
+            utm_term: currentParams.get("utm_term"),
+            utm_content: currentParams.get("utm_content"),
+            referrer_name: currentParams.get("referrer_name"),
+            person_id: posthog.get_distinct_id(),
+            title: addressData?.title || "",
+            formatted_address: addressData?.formattedAddress || "",
+            external_id: addressData?.externalId || "",
+            external_url: addressData?.externalUrl || "",
+            house_number: addressData?.houseNumber || "",
+            street: addressData?.street || "",
+            street_address: `${addressData?.houseNumber || ""} ${addressData?.street || ""}`.trim(),
+            street_2: addressData?.street_2 || "",
+            city: addressData?.city || "",
+            county: addressData?.county || "",
+            state_short: addressData?.stateShort || "",
+            state_long: addressData?.stateLong || "",
+            country_code: addressData?.countryCode || "",
+            country_long: addressData?.countryLong || "",
+            postal_code: addressData?.postalCode || "",
+          };
+
+          var filteredParams = {};
+          Object.entries(selectedParams).forEach(([k, v]) => {
+            if (v) {
+              filteredParams[k] = v;
+            }
+          });
+
+          var params = new URLSearchParams(filteredParams).toString();
+          url.search = params;
+          window.location.href = url.toString();
+          return;
+        }
+
+        var signUpFormURL = "https://join.basepowercompany.com/";
+        var url = new URL(signUpFormURL);
+        var currentParams = new URLSearchParams(window.location.search);
+
+        var selectedParams = {
+          gclid: currentParams.get("gclid"),
+          utm_source: currentParams.get("utm_source"),
+          utm_medium: currentParams.get("utm_medium"),
+          utm_campaign: currentParams.get("utm_campaign"),
+          utm_term: currentParams.get("utm_term"),
+          utm_content: currentParams.get("utm_content"),
+          referrer_name: currentParams.get("referrer_name"),
+          addressData: JSON.stringify(addressData),
+        };
+
+        var filteredParams = {};
+        Object.entries(selectedParams).forEach(([k, v]) => {
+          if (v) {
+            filteredParams[k] = v;
+          }
+        });
+
+        url.search = new URLSearchParams(filteredParams).toString();
+        window.location.href = url.toString();
+        return;
+      }
+      posthog.capture("user-sees-hubspot-form");
+    }
 
         if (zipConfig?.servingNow === "preorder") {
           if (posthog) {
