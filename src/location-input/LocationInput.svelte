@@ -20,26 +20,22 @@
 
   onMount(async () => {
     loadZips();
-    const input = document.querySelector('input.location-search-input');
-    const container = document.querySelector('.input-address-container');
-    
-    input.addEventListener('focus', () => {
+    jQuery(".input-address-container").on("click", function () {
       jQuery(".focus_overlay").show();
-      container.classList.add("focused");
-      input.placeholder = "Enter your home address";
+      jQuery(".input-address-container").addClass("focused");
+      jQuery("input.location-search-input").attr(
+        "placeholder",
+        "Enter your address",
+      );
       jQuery("button.submitAddressButton").hide();
     });
-
-    input.addEventListener('blur', () => {
-      if (!document.querySelector('.pac-container')?.contains(document.activeElement)) {
-        jQuery(".focus_overlay").hide();
-        jQuery(".submitAddressButton").show();
-        container.classList.remove("focused");
-      }
+    jQuery(".input-address-container").on("keydown", function () {
+      jQuery("input.location-search-input").attr("placeholder", "");
     });
-
     jQuery(".focus_overlay").on("click", function () {
-      input.blur();
+      jQuery(".focus_overlay").hide();
+      jQuery(".submitAddressButton").show();
+      jQuery(".input-address-container").removeClass("focused");
     });
   });
 
@@ -118,42 +114,41 @@
       );
     }
   };
-
-  // Update placeholder text
-  const defaultPlaceholder = "Enter your home address";
 </script>
 
-<div class="component-wrapper">
-  <div class="input-address-wrap">
-    <div class="input-address-container">
-      <img
-        src="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.1/public/Base_files/map-pin.svg"
-        alt="Map pin icon"
-        class="location-pin"
-      />
-      <GooglePlaceAutocomplete
-        class="location-search-input"
-        apiKey={googlePublicApiKey}
-        placeholder={defaultPlaceholder}
-        onSelect={(value) => {
-          const parsed = parsePlaceResult(value);
-          onAddressSelect?.(parsed);
-          window.blur();
-          inputErrorMessage = "";
-          selectedAddress = parsed;
-          handleSubmit();
-        }}
-        options={{
-          componentRestrictions: { country: "us" },
-        }}
-      />
-    </div>
-    <button class="submitAddressButton button secondary w-button">
-      {addressCtaText}
-    </button>
-  </div>
-</div>
+<div class="input-address-wrap">
+  <div class="input-address-container">
+    <img
+      src="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.1/public/Base_files/map-pin.svg"
+      alt="Map pin icon"
+    />
+    <GooglePlaceAutocomplete
+      class="location-search-input"
+      apiKey={googlePublicApiKey}
+      placeholder="See if your home qualifies"
+      onSelect={(value) => {
+        const parsed = parsePlaceResult(value);
+        onAddressSelect?.(parsed);
+        window.blur();
+        inputErrorMessage = "";
 
+        selectedAddress = parsed;
+        handleSubmit();
+      }}
+      options={{
+        componentRestrictions: { country: "us" },
+      }}
+    />
+  </div>
+  <button class="submitAddressButton button secondary w-button">
+    {addressCtaText}
+  </button>
+  {#if inputErrorMessage}
+    <p class="preorder-address-error-message">
+      {inputErrorMessage}
+    </p>
+  {/if}
+</div>
 <div class="focus_overlay"></div>
 
 <svelte:head>
@@ -164,189 +159,150 @@
   ></script>
 </svelte:head>
 
-<style lang="scss">
-  .component-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-
-    @media screen and (max-width: 768px) {
-      flex-direction: column;
-      gap: 12px;
-    }
-  }
-
-  .input-address-wrap {
-    position: relative;
-    z-index: 551;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    padding: 8px;
-    width: 100%;
-    height: 64px;
-    display: flex;
-    align-items: center;
-
-    @media screen and (max-width: 768px) {
-      height: auto;
-      padding: 4px;
-      flex-direction: column;
-      gap: 12px;
-      background: none;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-      border: none;
-    }
-  }
-
+<style lang="scss" global>
   .input-address-container {
     display: flex;
-    padding: 0 16px;
-    align-items: center;
-    height: 56px;
-    border-radius: 12px;
+    padding: var(--Spacing-spacing-m, 8px);
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: var(--Spacing-spacing-m, 8px);
+    align-self: stretch;
+    height: 66px;
+    background: #fff;
+    border-radius: var(--Radius-radius-l, 12px);
     position: relative;
-    z-index: 552;
-    background: transparent !important;
-    flex: 1;
-    
-    &.focused {
-      outline: none;
-      border: none;
-    }
-    
-    .location-pin {
-      width: 20px;
-      height: 20px;
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      opacity: 1;
-      z-index: 552;
-      pointer-events: none;
-    }
-
+    z-index: 551;
     @media screen and (max-width: 768px) {
-      width: 100%;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
       height: 48px;
-      padding: 0 12px;
-      background: rgba(255, 255, 255, 0.25) !important;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 0px;
     }
   }
-
-  .location-search-input {
-    position: relative;
-    height: 44px;
-    width: 100%;
-    border: none;
-    background: transparent !important;
+  .input-address-container.focused {
+    /* Focus styles */
+    outline: 2px solid var(--Greyscale-20, #d2d4d4);
+  }
+  .input-address-container.focused:before {
+    content: " ";
+    position: absolute;
+    z-index: -1;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
     border-radius: 12px;
-    padding: 3px 16px 3px 48px;
-    font-size: 18px;
-    line-height: 24px;
-    color: #FFF !important;
-    font-family: PP Neue Montreal Variable, Arial, sans-serif;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    mix-blend-mode: normal !important;
-    isolation: isolate !important;
-    
-    &::placeholder {
-      color: #FFF !important;
-      opacity: 1 !important;
-      padding-left: 24px;
-      mix-blend-mode: normal !important;
-      isolation: isolate !important;
-    }
-
-    // Force white text in all states
-    &, &:focus, &:hover, &:active, &::placeholder {
-      color: #FFF !important;
-    }
+    border: 1px solid var(--Greyscale-90, #333e3f);
   }
-
-  :global(.pac-container) {
-    z-index: 553 !important;
-    position: relative;
-    margin-top: 8px !important;
-    background: rgba(255, 255, 255, 0.15) !important;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    box-shadow: none;
-    padding: 8px 4px;
+  .input-address-container img {
+    margin: 13px 0 9px 10px;
+    position: absolute;
+    left: 8px;
   }
-
-  :global(.pac-item) {
-    z-index: 554 !important;
-    position: relative;
-    background: transparent !important;
-    padding: 8px 16px;
-    border: none;
-    color: #FFF !important;
-    font-family: PP Neue Montreal Variable, Arial, sans-serif;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.25) !important;
-    }
-  }
-
-  :global(.pac-item-query) {
-    color: #FFF !important;
-    font-family: PP Neue Montreal Variable, Arial, sans-serif;
-  }
-
-  :global(.pac-matched),
-  :global(.pac-item span) {
-    color: #FFF !important;
-    opacity: 1;
-  }
-
   .submitAddressButton {
-    height: 48px;
-    min-width: fit-content;
     display: flex;
+    flex-shrink: 0;
+    height: 48px;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-radius: 12px;
-    background: #D0F585;
-    color: #084D41;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 0 24px;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-    margin-left: 8px;
-
+    gap: var(--Spacing-spacing-m, 8px);
+    border-radius: var(--Radius-radius-m, 8px);
+    background: var(--Semantics-primary, #0c9953);
+    color: var(--Semantics-onPrimary, #fff);
+    text-align: center;
+    position: absolute;
+    right: 9px;
+    margin-top: -56px;
+    z-index: 551;
     @media screen and (max-width: 768px) {
+      position: relative;
       width: 100%;
-      margin-left: 0;
+      margin-top: 10px;
+      margin-left: 10px;
     }
 
-    &:hover {
-      opacity: 0.9;
-    }
-
-    &.hide {
-      display: none;
-    }
+    /* label/label2 */
+    font-size: 14px;
+    font-weight: 500;
   }
 
   .preorder-address-error-message {
     color: #c95151;
     font-size: 14px;
     margin-top: 6px;
-    font-family: PP Neue Montreal Variable, Arial, sans-serif;
+  }
+  .location-search-input {
+    position: absolute;
+    height: 44px;
+    width: 100%;
+    border: none;
+    background: none;
+    border-radius: 12px;
+    border: none !important;
+    outline: none !important;
+    /* body/body1 */
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 24px; /* 133.333% */
+    padding: 3px 16px 0 48px;
+    &.focused {
+      border-radius: 0 0 12px 12px;
+    }
+  }
+  .location-search-input::placeholder {
+    color: var(--Greyscale-60, #777e7f);
+  }
+  .location-search-input.input:focus {
+    box-shadow: none;
+  }
+
+  .hs-form__virality-link {
+    display: none !important;
+  }
+
+  #popup-form {
+    transition: 0.2s all;
+  }
+
+  .signup_wrapper {
+    margin-bottom: 18px;
+    @media screen and (max-width: 768px) {
+      margin-bottom: 48px;
+    }
+  }
+
+  .signup_wrapper .paragraph.text-color-white.beta_text {
+    display: inline;
+    position: absolute;
+    left: 0;
+    gap: var(--Spacing-spacing-m, 8px);
+    border-radius: 4px;
+    background: rgba(28, 40, 41, 0.5);
+    color: var(--Primitives-White, #fff);
+    padding: var(--Spacing-spacing-xs, 2px) var(--Spacing-spacing-m, 8px);
+    margin-top: 6px;
+
+    /* body/body2 */
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+  }
+
+  .button.secondary {
+    color: var(--Semantics-onPrimary, #fff);
+    background: var(--Semantics-primary, #0c9953);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    @media screen and (max-width: 768px) {
+      left: 0;
+    }
+  }
+  .button.secondary:hover {
+    background: var(--Semantics-primary, #065c3f);
   }
 
   .focus_overlay {
@@ -358,49 +314,5 @@
     background: rgba(40, 51, 52, 0.5);
     z-index: 50;
     display: none;
-    
-    &.show {
-      display: block;
-    }
-  }
-
-  :global(input.location-search-input) {
-    padding-left: 24px !important;
-    text-indent: 4px !important;
-    outline: none !important;
-    box-shadow: none !important;
-    border: none !important;
-    color: #FFF !important;
-    mix-blend-mode: normal !important;
-    isolation: isolate !important;
-    
-    &::placeholder {
-      color: #FFF !important;
-      opacity: 1 !important;
-      mix-blend-mode: normal !important;
-      isolation: isolate !important;
-    }
-
-    &:focus {
-      outline: none !important;
-      box-shadow: none !important;
-      border: none !important;
-      color: #FFF !important;
-    }
-
-    &:-webkit-autofill,
-    &:-webkit-autofill:hover,
-    &:-webkit-autofill:focus {
-      -webkit-box-shadow: 0 0 0 30px transparent inset !important;
-      box-shadow: 0 0 0 30px transparent inset !important;
-      border: none !important;
-      -webkit-text-fill-color: #FFF !important;
-      caret-color: #FFF !important;
-    }
-  }
-
-  :global(.pac-item),
-  :global(.pac-item-query) {
-    color: #FFF !important;
   }
 </style>

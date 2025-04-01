@@ -187,21 +187,4 @@
   .pac-icon.pac-icon-marker {
     display: none;
   }
-
-  // Add these global styles
-  input.location-search-input {
-    background: transparent !important;
-    background-color: transparent !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-  }
-
-  // Override Google's autocomplete styles
-  input.location-search-input:-webkit-autofill,
-  input.location-search-input:-webkit-autofill:hover,
-  input.location-search-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
-    -webkit-text-fill-color: #084D41 !important;
-    transition: background-color 5000s ease-in-out 0s;
-  }
 </style>
