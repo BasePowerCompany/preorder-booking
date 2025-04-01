@@ -229,7 +229,6 @@
       opacity: 1;
       z-index: 552;
       pointer-events: none;
-      filter: brightness(0) invert(1);
     }
 
     @media screen and (max-width: 768px) {
