@@ -251,7 +251,7 @@
     background: transparent !important;
     border-radius: 12px;
     padding: 3px 16px 3px 48px;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 24px;
     color: #FFF !important;
     font-family: PP Neue Montreal Variable, Arial, sans-serif;
@@ -266,7 +266,6 @@
       padding-left: 24px;
       mix-blend-mode: normal !important;
       isolation: isolate !important;
-      font-weight: 400 !important;
     }
 
     // Force white text in all states
@@ -381,7 +380,6 @@
       opacity: 1 !important;
       mix-blend-mode: normal !important;
       isolation: isolate !important;
-      font-weight: 400 !important;
     }
 
     &:focus {
