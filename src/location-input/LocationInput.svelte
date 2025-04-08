@@ -154,7 +154,6 @@
 <svelte:head>
   <script
     charset="utf-8"
-    type="text/javascript"
     src="//js-eu1.hsforms.net/forms/embed/v2.js"
   ></script>
 </svelte:head>
@@ -183,7 +182,7 @@
   }
   .input-address-container.focused {
     /* Focus styles */
-    outline: 2px solid var(--Greyscale-20, #d2d4d4);
+    outline: 2px solid var(--Greyscale-20, #D8D7D5);
   }
   .input-address-container.focused:before {
     content: " ";
@@ -194,7 +193,7 @@
     right: 0px;
     bottom: 0px;
     border-radius: 12px;
-    border: 1px solid var(--Greyscale-90, #333e3f);
+    border: 1px solid var(--Greyscale-90, #54524F);
   }
   .input-address-container img {
     margin: 13px 0 9px 10px;
@@ -210,23 +209,21 @@
     align-items: center;
     gap: var(--Spacing-spacing-m, 8px);
     border-radius: var(--Radius-radius-m, 8px);
-    background: var(--Semantics-primary, #0c9953);
-    color: var(--Semantics-onPrimary, #fff);
-    text-align: center;
     position: absolute;
     right: 9px;
     margin-top: -56px;
     z-index: 551;
+    
+    /* label/label2 */
+    font-size: 14px;
+    font-weight: 500;
+    
     @media screen and (max-width: 768px) {
       position: relative;
       width: 100%;
       margin-top: 10px;
       margin-left: 10px;
     }
-
-    /* label/label2 */
-    font-size: 14px;
-    font-weight: 500;
   }
 
   .preorder-address-error-message {
@@ -243,17 +240,18 @@
     border-radius: 12px;
     border: none !important;
     outline: none !important;
-    /* body/body1 */
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 400;
-    line-height: 24px; /* 133.333% */
+    line-height: 24px;
     padding: 3px 16px 0 48px;
     &.focused {
       border-radius: 0 0 12px 12px;
     }
   }
   .location-search-input::placeholder {
-    color: var(--Greyscale-60, #777e7f);
+    color: #7F7D7A;
+    font-size: 14px;
+    font-weight: 500;
   }
   .location-search-input.input:focus {
     box-shadow: none;
@@ -292,8 +290,8 @@
   }
 
   .button.secondary {
-    color: var(--Semantics-onPrimary, #fff);
-    background: var(--Semantics-primary, #0c9953);
+    color: #084D41;
+    background: #D0F585;
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
@@ -302,7 +300,7 @@
     }
   }
   .button.secondary:hover {
-    background: var(--Semantics-primary, #065c3f);
+    background: #ECFAD0;
   }
 
   .focus_overlay {
@@ -311,7 +309,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(40, 51, 52, 0.5);
+    background: rgba(41, 40, 38, 0.8);
     z-index: 50;
     display: none;
   }
