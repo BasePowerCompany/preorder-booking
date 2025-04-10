@@ -169,7 +169,7 @@
     align-self: stretch;
     height: 66px;
     background: #fff;
-    border-radius: var(--Radius-radius-l, 12px);
+    border-radius: var(--Radius-radius-l, 8px);
     position: relative;
     z-index: 551;
     @media screen and (max-width: 768px) {
@@ -215,7 +215,7 @@
     z-index: 551;
     
     /* label/label2 */
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     
     @media screen and (max-width: 768px) {
@@ -250,7 +250,7 @@
   }
   .location-search-input::placeholder {
     color: #7F7D7A;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
   }
   .location-search-input.input:focus {
