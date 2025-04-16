@@ -90,7 +90,7 @@ export const PreorderApp = {
         onAddressSelect,
         onAddressSubmitSuccess,
         hidePanelEl,
-        addressCtaText,
+        addressCtaText: "See if my home qualifies",
       },
     });
 

@@ -14,7 +14,7 @@
 
   export let googlePublicApiKey: string;
   export let googleSheetConfig: SheetDataConfig;
-  export let addressCtaText: string = "Get started";
+  export let addressCtaText: string = "See if my home qualifies";
 
   const { store: zipStore, load: loadZips } = getZipStore(googleSheetConfig);
 
@@ -25,7 +25,7 @@
       jQuery(".input-address-container").addClass("focused");
       jQuery("input.location-search-input").attr(
         "placeholder",
-        "Enter your address",
+        "Enter your home address",
       );
       jQuery("button.submitAddressButton").hide();
     });
@@ -125,7 +125,7 @@
     <GooglePlaceAutocomplete
       class="location-search-input"
       apiKey={googlePublicApiKey}
-      placeholder="See if your home qualifies"
+      placeholder="Enter your home address"
       onSelect={(value) => {
         const parsed = parsePlaceResult(value);
         onAddressSelect?.(parsed);
@@ -240,7 +240,7 @@
     border-radius: 12px;
     border: none !important;
     outline: none !important;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     padding: 3px 16px 0 48px;
@@ -250,7 +250,7 @@
   }
   .location-search-input::placeholder {
     color: #7F7D7A;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 500;
   }
   .location-search-input.input:focus {
