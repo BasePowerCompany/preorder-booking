@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+  declare const jQuery: any; // Tell TypeScript that jQuery exists globally
+</script>
+
 <script lang="ts">
   import GooglePlaceAutocomplete from "./googlePlace/GooglePlaceAutocomplete.svelte";
   import { ParsedPlaceResult, parsePlaceResult } from "./googlePlace/utils";
