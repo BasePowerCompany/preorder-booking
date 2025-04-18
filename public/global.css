@@ -1,0 +1,9 @@
+#zip-code-entry {
+  margin-bottom: 200px !important;
+}
+
+.signup_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 200px;
+}
