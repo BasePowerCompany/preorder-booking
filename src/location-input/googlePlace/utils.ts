@@ -2,7 +2,24 @@ const initAddressComponentsByType: {
   [k: string]: google.maps.GeocoderAddressComponent;
 } = {};
 
-export const parsePlaceResult = (place: google.maps.places.PlaceResult) => {
+export type ParsedPlaceResult = {
+  title: string | null;
+  formattedAddress: string | null;
+  externalId: string | null;
+  externalUrl: string | null;
+  houseNumber: string | null;
+  street: string | null;
+  street_2: string | null;
+  city: string | null;
+  county: string | null;
+  stateShort: string | null;
+  stateLong: string | null;
+  countryCode: string | null;
+  countryLong: string | null;
+  postalCode: string | null;
+};
+
+export const parsePlaceResult = (place: google.maps.places.PlaceResult): ParsedPlaceResult => {
   console.log(place)
   const addressComponentsByType = (place.address_components || []).reduce(
     function (acc, data) {
@@ -49,5 +66,3 @@ export const parsePlaceResult = (place: google.maps.places.PlaceResult) => {
 
   return result;
 };
-
-export type ParsedPlaceResult = ReturnType<typeof parsePlaceResult>;

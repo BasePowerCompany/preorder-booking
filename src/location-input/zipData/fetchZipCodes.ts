@@ -1,11 +1,13 @@
 import {
   storedZipDataItemKeys,
-  type SheetDataConfig,
-  type StoredZipData,
-  type StoredZipDataItem,
-  type StoredZipDataItemKey,
-  StoredZipCSVColumnName,
   StoredZipCSVColumnNames,
+} from "./types";
+import type {
+  SheetDataConfig,
+  StoredZipData,
+  StoredZipDataItem,
+  StoredZipDataItemKey,
+  StoredZipCSVColumnName,
 } from "./types";
 // import { deregulatedZipData } from "./data";
 

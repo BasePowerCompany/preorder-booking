@@ -8,6 +8,7 @@ import { svelteSVG } from "rollup-plugin-svelte-svg";
 import typescript from "@rollup/plugin-typescript";
 import css from "rollup-plugin-css-only";
 import replace from "@rollup/plugin-replace";
+import * as sass from 'sass';
 
 const production = !process.env.ROLLUP_WATCH;
 const ASSET_URL =
@@ -60,7 +61,10 @@ const createRollupConfigBase = (foo) => {
           postcss: {
             plugins: [require("autoprefixer")()],
           },
-          scss: {},
+          scss: {
+            implementation: sass,
+            renderSync: true
+          },
         }),
 
         compilerOptions: {

@@ -4,5 +4,5 @@ import type { StoredZipDataItem } from "./location-input/zipData/types";
 export type OnAddressSubmitSuccess = (
   data: ParsedPlaceResult,
   type: string,
-  zipConfig: StoredZipDataItem
+  zipConfig: StoredZipDataItem | null
 ) => void;

@@ -17,15 +17,6 @@
   crossorigin
 ></script>
 
-<!-- DEPRECATED: Legacy form handling - keeping for reference -->
-<!--
-<script type="text/javascript">
-  const hsOnFormSubmitted = (form, args) => {
-    // ... all the legacy routing logic ...
-  };
-  window.hsOnFormSubmitted = hsOnFormSubmitted;
-</script>
--->
 
 <!-- Two up interaction -->
 <script>
@@ -209,6 +200,128 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 </script>
 
+<!-- ZIP code app init -->
+<script>
+  posthog.onFeatureFlags(function () {
+    // Always use new routing
+    var redirectToSignupForm = true;
+    var useTypeformSignUp = true;
+    
+    BasePreorderApp.initializeZipCode({
+      targetElAddressInput: document.getElementById("zip-code-entry"),
+      targetPanel: "#popup-form",
+      targetAddressPanel: "#address-popup",
+      targetAvailableState: "#preorder-base",
+      targetNotAvailableState: "#not-available",
+      targetStateContainer: "#popup-form .form-box_holder",
+      targetAvailableText: `#preorder-availability`,
+      querySelectorClickToOpenForm: '[data-preorder="open"]',
+      googleSheetConfig: {
+        zipsCsvUrl: "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
+      },
+      // hubspot
+      hsFormSuccess: {
+        target: "#hubspot-preorder-form",
+        region: "na1",
+        portalId: "43873875",
+        formId: "a41c83a1-a371-4080-be84-5699814bc294",
+        onFormSubmit: () => {
+          if (posthog) {
+            posthog.capture("user-submit-hubspot-form-zip");
+          }
+          gtag("event", "preorder-submitted-zip");
+        },
+        onFormSubmitted: () => {
+          window.location.href = "/newsletter-confirmation";
+        },
+      },
+      hsFormNewsletter: {
+        target: "#hubspot-email-form",
+        region: "na1",
+        portalId: "43873875",
+        formId: "bdfdc2d3-1e91-44e7-a477-02a68a93d0f9",
+        onFormSubmit: () => {
+          gtag("event", "newsletter-submitted-zip");
+        },
+        onFormSubmitted: () => {
+          window.location.href = "/newsletter-confirmation";
+        },
+      },
+      hidePanelEl: redirectToSignupForm,
+      onAddressSubmitSuccess: async (addressData, leadType, zipConfig) => {
+        gtag("event", "zip-submit", { leadType, addressData, zipConfig });
+        window.hubspotAddressData = addressData;
+
+        var marketStatus = "no";
+        try {
+          const response = await fetch("https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv");
+          const csvText = await response.text();
+          const lines = csvText.split("\n");
+
+          lines.slice(1).some((line) => {
+            const columns = line.split(",");
+            if (columns[1]?.trim() === addressData?.postalCode?.trim()) {
+              // Check for yes or houston (both count as "yes")
+              if (columns[4]?.trim() === "yes" || columns[4]?.trim() === "houston") {
+                marketStatus = "yes";
+                return true;
+              } 
+              // Check for preorder
+              else if (columns[4]?.trim() === "preorder") {
+                marketStatus = "preorder";
+                return true;
+              }
+            }
+            return false;
+          });
+        } catch (error) {
+          console.error("Error checking zip code:", error);
+        }
+
+        console.log('Market status determined:', marketStatus);
+
+        // New simplified routing
+        var redirectPath = '/not-available';
+        if (marketStatus === "yes") {
+          redirectPath = '/available-now';
+        } else if (marketStatus === "preorder") {
+          redirectPath = '/available-soon';
+        }
+
+        // Keep param handling for analytics
+        var url = new URL(redirectPath, window.location.origin);
+        var currentParams = new URLSearchParams(window.location.search);
+        
+        var selectedParams = {
+          zip: addressData?.postalCode || "", // Add zip code to URL params
+          gclid: currentParams.get("gclid"),
+          utm_source: currentParams.get("utm_source"),
+          utm_medium: currentParams.get("utm_medium"),
+          utm_campaign: currentParams.get("utm_campaign"),
+          utm_term: currentParams.get("utm_term"),
+          utm_content: currentParams.get("utm_content"),
+          referrer_name: currentParams.get("referrer_name"),
+          person_id: posthog.get_distinct_id()
+        };
+
+        // Filter out empty params
+        var filteredParams = {};
+        Object.entries(selectedParams).forEach(([k, v]) => {
+          if (v) {
+            filteredParams[k] = v;
+          }
+        });
+
+        console.log('Redirecting to:', redirectPath, 'with params:', filteredParams);
+
+        url.search = new URLSearchParams(filteredParams).toString();
+        url = updateTypeformLink(url);
+        window.location.href = url.toString();
+      },
+    });
+  });
+</script>
+
 <!-- Load Google Places API -->
 <!-- <script async type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtFCcssmw2kdWq90R_D6JDqPIqRFOYsE0&libraries=places"></script> -->
 <!-- Set autocomplete input -->
@@ -267,66 +380,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 </script>
-
-<!-- DEPRECATED: Outage Form Handling
-<script type="text/javascript">
-  document.addEventListener("DOMContentLoaded", function () {
-    // Get the Webflow form element by ID
-    const form = document.getElementById("wf-form-Outage-Form");
-
-    if (!form) {
-      return;
-    }
-
-    // Add an event listener for the form submission
-    form.addEventListener("submit", function (event) {
-      event.preventDefault(); // Prevent the default form submission
-
-      // Get the address from the form input field
-      var selectedAddress = document.getElementById("Address").value;
-      var reportEmail = document.getElementById("outage-email").value;
-
-      if (selectedAddress) {
-        // Trigger the workflow with the selected address
-        triggerWorkflow(selectedAddress, reportEmail);
-      } else {
-        console.error("No address selected");
-      }
-    });
-  });
-
-  // Function to trigger retool workflow
-  async function triggerWorkflow(address, reportEmail) {
-    const promoCodeMetadataURL =
-      "https://api.retool.com/v1/workflows/97383d56-9f11-4d5c-903c-859455cacbe8/startTrigger?workflowApiKey=retool_wk_e71f1d9ddc48499fb12dd9ad7f295039"; // Your Retool API URL here
-
-    const body = JSON.stringify({
-      address: address, // Send the address in the body of the request
-      email: reportEmail,
-    });
-
-    try {
-      const response = await fetch(promoCodeMetadataURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: body,
-      });
-
-      if (!response.ok) {
-        console.error("Failed to trigger workflow");
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Workflow triggered successfully:", data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
-</script>
--->
 
 <!-- Third-party trackers last -->
 

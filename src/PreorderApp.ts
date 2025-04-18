@@ -172,15 +172,7 @@ export const PreorderApp = {
       target: targetElAddressInput,
       props: {
         googleSheetConfig,
-        targetAvailableText,
-        targetDisplayAddress,
-        addressPanelEl,
-        targetAvailableStateEl,
-        stateContainerEl,
-        panelEl,
-        targetNotAvailableStateEl,
         onAddressSubmitSuccess,
-        hidePanelEl,
         addressCtaText,
       },
     });
