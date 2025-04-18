@@ -4,7 +4,8 @@
 
 <script lang="ts">
   import GooglePlaceAutocomplete from "./googlePlace/GooglePlaceAutocomplete.svelte";
-  import { ParsedPlaceResult, parsePlaceResult } from "./googlePlace/utils";
+  import type { ParsedPlaceResult } from "./googlePlace/utils";
+  import { parsePlaceResult } from "./googlePlace/utils";
   import { setHiddenHubspotInputs } from "./hubspot/hsFormUtils";
   import { displayBlock, displayNone, fadeIn } from "../visibilityUtils";
   import { onMount } from "svelte";
@@ -217,9 +218,10 @@
     right: 9px;
     margin-top: -56px;
     z-index: 551;
+    padding: 0 20px;
     
     /* label/label2 */
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
     
     @media screen and (max-width: 768px) {
@@ -244,8 +246,8 @@
     border-radius: 12px;
     border: none !important;
     outline: none !important;
-    font-size: 16px;
-    font-weight: 400;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 24px;
     padding: 3px 16px 0 48px;
     &.focused {
@@ -254,7 +256,7 @@
   }
   .location-search-input::placeholder {
     color: #7F7D7A;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 500;
   }
   .location-search-input.input:focus {
