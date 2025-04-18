@@ -1,3 +1,7 @@
+<script context="module" lang="ts">
+  declare const jQuery: any; // Tell TypeScript that jQuery exists globally
+</script>
+
 <script lang="ts">
   import GooglePlaceAutocomplete from "./googlePlace/GooglePlaceAutocomplete.svelte";
   import type { ParsedPlaceResult } from "./googlePlace/utils";
@@ -15,7 +19,7 @@
 
   export let googlePublicApiKey: string;
   export let googleSheetConfig: SheetDataConfig;
-  export let addressCtaText: string = "Get started";
+  export let addressCtaText: string = "See if my home qualifies";
 
   const { store: zipStore, load: loadZips } = getZipStore(googleSheetConfig);
 
@@ -26,7 +30,7 @@
       jQuery(".input-address-container").addClass("focused");
       jQuery("input.location-search-input").attr(
         "placeholder",
-        "Enter your address",
+        "Enter your home address",
       );
       jQuery("button.submitAddressButton").hide();
     });
@@ -126,7 +130,7 @@
     <GooglePlaceAutocomplete
       class="location-search-input"
       apiKey={googlePublicApiKey}
-      placeholder="See if your home qualifies"
+      placeholder="Enter your home address"
       onSelect={(value) => {
         const parsed = parsePlaceResult(value);
         onAddressSelect?.(parsed);
