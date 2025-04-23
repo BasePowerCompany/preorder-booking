@@ -5,7 +5,7 @@
   import type { OnAddressSubmitSuccess } from "../types";
 
   export let googleSheetConfig: SheetDataConfig;
-  export let addressCtaText: string = "Get started";
+  export let addressCtaText: string = "See if I qualify";
   export let onAddressSubmitSuccess: OnAddressSubmitSuccess = () => {};
   const { store: zipStore, load: loadZips } = getZipStore(googleSheetConfig);
 
@@ -102,7 +102,6 @@
 </script>
 
 <div class="input-zip-wrap">
-  <div class="zip-badge">Enter your zip code</div>
   <div class="input-zip-container">
     <div class="zip-input-layout">
       <input
@@ -127,7 +126,7 @@
       on:click={handleSubmit}
       disabled={!isComplete}
     >
-      {addressCtaText}
+      {isComplete ? addressCtaText : "Enter your zip code"}
     </button>
   </div>
 </div>
@@ -141,18 +140,11 @@
     flex-direction: column;
     gap: 12px;
     position: relative;
-  }
 
-  .zip-badge {
-    display: inline-flex;
-    align-self: flex-start;
-    padding: 4px 12px;
-    background: rgba(28, 40, 41, 0.5);
-    border-radius: 4px;
-    color: #FFFFFF;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 20px;
+    @media screen and (max-width: 768px) {
+      max-width: 100%;
+      padding: 0 16px;
+    }
   }
 
   .input-zip-container {
@@ -169,6 +161,7 @@
     @media screen and (max-width: 768px) {
       padding: 8px;
       height: 64px;
+      margin: 0;
     }
   }
 
@@ -212,11 +205,10 @@
     
     @media screen and (max-width: 768px) {
       position: absolute;
-      width: 100%;
-      left: 0;
+      width: calc(100% - 32px);
+      left: 16px;
       top: calc(100% + 12px);
-      max-width: 400px;
-      margin: 0 auto;
+      margin: 0;
     }
   }
 
@@ -250,7 +242,7 @@
   }
 
   .zip-box.filled {
-    background: #D0F585;
+    background: #ECFFC7;
   }
 
   .zip-search-input {
