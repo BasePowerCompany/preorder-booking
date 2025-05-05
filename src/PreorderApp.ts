@@ -118,55 +118,52 @@ export const PreorderApp = {
       addressCtaText,
     } = props;
 
-    initializeHubspotForms({
-      hsFormSuccess,
-      hsFormNewsletter,
-    });
+    // Initialize Hubspot forms independently
+    if (hsFormSuccess || hsFormNewsletter) {
+      initializeHubspotForms({
+        hsFormSuccess,
+        hsFormNewsletter,
+      });
+    }
 
-    const panelEl = document.querySelector(targetPanel) as HTMLDivElement;
-    const stateContainerEl = document.querySelector(
-      targetStateContainer,
-    ) as HTMLDivElement;
+    // Only initialize panel elements if they are provided
+    const panelEl = targetPanel ? document.querySelector(targetPanel) as HTMLDivElement : null;
+    const stateContainerEl = targetStateContainer ? document.querySelector(targetStateContainer) as HTMLDivElement : null;
+    const addressPanelEl = targetAddressPanel ? document.querySelector(targetAddressPanel) as HTMLDivElement : null;
+    const targetAvailableStateEl = targetAvailableState ? document.querySelector(targetAvailableState) as HTMLDivElement : null;
+    const targetNotAvailableStateEl = targetNotAvailableState ? document.querySelector(targetNotAvailableState) as HTMLDivElement : null;
 
-    const addressPanelEl = document.querySelector(
-      targetAddressPanel,
-    ) as HTMLDivElement;
-    const targetAvailableStateEl = document.querySelector(
-      targetAvailableState,
-    ) as HTMLDivElement;
-    const targetNotAvailableStateEl = document.querySelector(
-      targetNotAvailableState,
-    ) as HTMLDivElement;
+    // Only set up click handlers if querySelectorClickToOpenForm is provided
+    if (querySelectorClickToOpenForm) {
+      document.querySelectorAll(querySelectorClickToOpenForm).forEach((el) => {
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          targetElAddressInput.scrollIntoView({
+            behavior: "smooth",
+          });
 
-    // open form button actions
-    document.querySelectorAll(querySelectorClickToOpenForm).forEach((el) => {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        targetElAddressInput.scrollIntoView({
-          behavior: "smooth",
+          const y =
+            targetElAddressInput.getBoundingClientRect().top +
+            window.scrollY -
+            300;
+
+          window.scrollTo({ top: y, behavior: "smooth" });
+
+          setTimeout(() => {
+            targetElAddressInput.querySelector("input").focus();
+          }, 1000);
         });
-
-        const y =
-          targetElAddressInput.getBoundingClientRect().top +
-          window.scrollY -
-          300;
-
-        window.scrollTo({ top: y, behavior: "smooth" });
-
-        setTimeout(() => {
-          targetElAddressInput.querySelector("input").focus();
-        }, 1000);
       });
-    });
+    }
 
-    /**
-     * close button
-     */
-    document.querySelectorAll(".close-button").forEach((el) => {
-      el.addEventListener("click", () => {
-        fadeOut(panelEl);
+    // Only set up close button if panelEl exists
+    if (panelEl) {
+      document.querySelectorAll(".close-button").forEach((el) => {
+        el.addEventListener("click", () => {
+          fadeOut(panelEl);
+        });
       });
-    });
+    }
 
     const zipCodeInput = new ZipCodeInput({
       target: targetElAddressInput,
@@ -174,6 +171,14 @@ export const PreorderApp = {
         googleSheetConfig,
         onAddressSubmitSuccess,
         addressCtaText,
+        panelEl,
+        stateContainerEl,
+        addressPanelEl,
+        targetAvailableStateEl,
+        targetNotAvailableStateEl,
+        targetAvailableText,
+        targetDisplayAddress,
+        hidePanelEl,
       },
     });
 

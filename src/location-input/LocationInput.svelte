@@ -221,8 +221,8 @@
     padding: 0 20px;
     
     /* label/label2 */
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
     
     @media screen and (max-width: 768px) {
       position: relative;
@@ -234,7 +234,7 @@
 
   .preorder-address-error-message {
     color: #c95151;
-    font-size: 14px;
+    font-size: 16px;
     margin-top: 6px;
   }
   .location-search-input {
@@ -246,7 +246,7 @@
     border-radius: 12px;
     border: none !important;
     outline: none !important;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     line-height: 24px;
     padding: 3px 16px 0 48px;
@@ -256,7 +256,7 @@
   }
   .location-search-input::placeholder {
     color: #7F7D7A;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
   }
   .location-search-input.input:focus {
