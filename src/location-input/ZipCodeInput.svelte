@@ -3,16 +3,28 @@
   import { getZipStore } from "./zipData/zipStore";
   import type { SheetDataConfig, StoredZipDataItem } from "./zipData/types";
   import type { OnAddressSubmitSuccess } from "../types";
+  import { displayBlock, displayNone, fadeIn } from "../visibilityUtils";
+  import { setHiddenHubspotInputs } from "./hubspot/hsFormUtils";
+  import { hsFormStateBooking } from "../windowVars";
 
   export let googleSheetConfig: SheetDataConfig;
   export let addressCtaText: string = "See if I qualify";
   export let onAddressSubmitSuccess: OnAddressSubmitSuccess = () => {};
+  export let panelEl: HTMLDivElement | null = null;
+  export let stateContainerEl: HTMLDivElement | null = null;
+  export let addressPanelEl: HTMLDivElement | null = null;
+  export let targetAvailableStateEl: HTMLDivElement | null = null;
+  export let targetNotAvailableStateEl: HTMLDivElement | null = null;
+  export let targetAvailableText: string | null = null;
+  export let targetDisplayAddress: string | null = null;
+  export let hidePanelEl: boolean = false;
+
   const { store: zipStore, load: loadZips } = getZipStore(googleSheetConfig);
 
   onMount(async () => {
     loadZips();
     const inputContainer = document.querySelector(".input-zip-container") as HTMLElement;
-    const focusOverlay = document.querySelector(".focus_overlay") as HTMLElement;
+    const focusOverlay = document.querySelector(".zip-focus_overlay") as HTMLElement;
     const input = document.querySelector(".zip-search-input") as HTMLInputElement;
 
     if (inputContainer && focusOverlay) {
@@ -59,14 +71,20 @@
       return;
     }
 
-    console.log('Submitting zip code:', zipCode);
+    if (panelEl && !hidePanelEl) {
+      fadeIn(panelEl);
+    }
+    if (stateContainerEl) {
+      displayBlock(stateContainerEl);
+    }
+    if (addressPanelEl) {
+      displayNone(addressPanelEl);
+    }
 
     const foundZipItem: StoredZipDataItem | null =
       $zipStore.find((zipItem) => {
         return zipItem.zip === zipCode;
       }) || null;
-
-    console.log('Found zip config:', foundZipItem);
 
     // Create a minimal address object for consistency with LocationInput
     const minimalAddress = {
@@ -86,13 +104,49 @@
       postalCode: zipCode
     };
 
-    console.log('Calling onAddressSubmitSuccess with:', {
-      address: minimalAddress,
-      type: foundZipItem ? "lead-preorder-form" : "lead-newsletter-form",
-      zipConfig: foundZipItem
-    });
+    if (foundZipItem) {
+      if (targetAvailableText) {
+        const targetAvailableTextEl = document.querySelector(targetAvailableText);
+        if (targetAvailableTextEl) {
+          targetAvailableTextEl.innerHTML = foundZipItem.availability;
+        }
+      }
 
-    // Let the parent handle routing based on availability
+      if (targetAvailableStateEl) {
+        displayBlock(targetAvailableStateEl);
+      }
+      if (targetNotAvailableStateEl) {
+        displayNone(targetNotAvailableStateEl);
+      }
+
+      if (window.hsFormPreorder) {
+        setHiddenHubspotInputs(
+          window.hsFormPreorder,
+          minimalAddress,
+          foundZipItem,
+        );
+      }
+      hsFormStateBooking.update({
+        selectedAddress: minimalAddress,
+        zipConfig: foundZipItem,
+      });
+    } else {
+      if (targetAvailableStateEl) {
+        displayNone(targetAvailableStateEl);
+      }
+      if (targetNotAvailableStateEl) {
+        displayBlock(targetNotAvailableStateEl);
+      }
+
+      if (window.hsFormNewsletter) {
+        setHiddenHubspotInputs(window.hsFormNewsletter, minimalAddress);
+      }
+      hsFormStateBooking.update({
+        selectedAddress: minimalAddress,
+        zipConfig: null,
+      });
+    }
+
     onAddressSubmitSuccess?.(
       minimalAddress,
       foundZipItem ? "lead-preorder-form" : "lead-newsletter-form",
@@ -186,8 +240,8 @@
     color: #084D41;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
@@ -235,7 +289,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
     color: #090D0F;
     transition: all 0.2s ease;
@@ -251,7 +305,7 @@
     width: 100%;
     border: none;
     background: transparent;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
     padding: 0;
     text-align: left;
@@ -272,7 +326,7 @@
 
   .preorder-zip-error-message {
     color: #c95151;
-    font-size: 14px;
+    font-size: 16px;
     text-align: center;
     margin-top: 8px;
   }

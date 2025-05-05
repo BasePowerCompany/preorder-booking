@@ -3,6 +3,7 @@ import type {
   SheetDataConfig,
   StoredZipDataItem,
 } from "./location-input/zipData/types";
+import type { OnAddressSubmitSuccess } from "./types";
 
 export type HubspotFormConfig = {
   target: string;
@@ -23,24 +24,22 @@ export type HubspotFormConfig = {
 };
 
 export type PreorderAppConfig = {
-  targetElAddressInput: HTMLDivElement;
-  googlePublicApiKey: string;
-  targetPanel: string;
-  targetAddressPanel: string;
-  targetAvailableState: string;
-  targetNotAvailableState: string;
-  targetStateContainer: string;
-  targetAvailableText: string;
-  targetDisplayAddress: string;
-  querySelectorClickToOpenForm: string;
+  targetElAddressInput?: HTMLElement;
+  targetElsAddressInput?: HTMLElement[];
+  googlePublicApiKey?: string;
+  targetPanel?: string;
+  targetAddressPanel?: string;
+  targetAvailableState?: string;
+  targetNotAvailableState?: string;
+  targetStateContainer?: string;
+  targetAvailableText?: string;
+  targetDisplayAddress?: string;
+  querySelectorClickToOpenForm?: string;
   googleSheetConfig: SheetDataConfig;
-  hsFormSuccess: HubspotFormConfig;
-  hsFormNewsletter: HubspotFormConfig;
+  hsFormSuccess?: HubspotFormConfig;
+  hsFormNewsletter?: HubspotFormConfig;
   onAddressSelect?: (data: ParsedPlaceResult) => void;
-  onAddressSubmitSuccess?: (
-    data: ParsedPlaceResult,
-    type: string,
-  ) => void | undefined;
+  onAddressSubmitSuccess?: OnAddressSubmitSuccess;
   hidePanelEl?: boolean;
   addressCtaText?: string;
 };
