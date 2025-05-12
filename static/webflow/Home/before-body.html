@@ -50,7 +50,7 @@
     var redirectToSignupForm = true;
     var useTypeformSignUp = true;
 
-    var useNewOnboarding = posthog.isFeatureEnabled("test-test");
+    var useNewOnboarding = posthog.isFeatureEnabled("use-new-onboarding");
 
     BasePreorderApp.initialize({
       targetElsAddressInput: [
@@ -143,9 +143,9 @@
         }
 
         var originURL = window.location.origin;
+        var redirectPath = "/join-waitlist"; // Default path
 
-        // New simplified routing
-        var redirectPath = "/join-waitlist";
+        // Handle different market statuses
         if (marketStatus === "yes") {
           if (useNewOnboarding) {
             originURL =
@@ -200,7 +200,6 @@
         });
 
         url.search = new URLSearchParams(filteredParams).toString();
-        url = updateTypeformLink(url);
         window.location.href = url.toString();
       },
     });
