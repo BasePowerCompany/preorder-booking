@@ -17,31 +17,30 @@
   crossorigin
 ></script>
 
-
 <!-- Two up interaction -->
 <script>
-window.addEventListener('DOMContentLoaded', () => {
-  const items = document.querySelectorAll('.home-two-up-item');
-  console.log('Found items:', items.length);
+  window.addEventListener("DOMContentLoaded", () => {
+    const items = document.querySelectorAll(".home-two-up-item");
+    console.log("Found items:", items.length);
 
-  items.forEach((item, index) => {
-    item.addEventListener('click', () => {
-      console.log('clicked');
-      const isExpanded = item.classList.contains('expand');
-      const otherItem = items[1 - index];
+    items.forEach((item, index) => {
+      item.addEventListener("click", () => {
+        console.log("clicked");
+        const isExpanded = item.classList.contains("expand");
+        const otherItem = items[1 - index];
 
-      if (isExpanded) {
-        item.classList.remove('expand');
-        otherItem.classList.remove('shrink');
-      } else {
-        item.classList.add('expand');
-        item.classList.remove('shrink');
-        otherItem.classList.remove('expand');
-        otherItem.classList.add('shrink');
-      }
+        if (isExpanded) {
+          item.classList.remove("expand");
+          otherItem.classList.remove("shrink");
+        } else {
+          item.classList.add("expand");
+          item.classList.remove("shrink");
+          otherItem.classList.remove("expand");
+          otherItem.classList.add("shrink");
+        }
+      });
     });
   });
-});
 </script>
 
 <!-- Pre-order app init -->
@@ -50,7 +49,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // Always use new routing
     var redirectToSignupForm = true;
     var useTypeformSignUp = true;
-    
+
+    var useNewOnboarding = posthog.isFeatureEnabled("use-new-onboarding");
+
     BasePreorderApp.initialize({
       targetElsAddressInput: [
         document.getElementById("address-form"),
@@ -112,13 +113,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
         var marketStatus = "unavailable";
         try {
-          const response = await fetch("https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv");
+          const response = await fetch(
+            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
+          );
           const csvText = await response.text();
           const lines = csvText.split("\n");
 
           lines.slice(1).some((line) => {
             const columns = line.split(",");
-            if (columns[1]?.trim() === addressData?.postalCode?.trim()?.substring(0, 5)) {
+            if (
+              columns[1]?.trim() ===
+              addressData?.postalCode?.trim()?.substring(0, 5)
+            ) {
               if (columns[4]?.trim() === "yes") {
                 marketStatus = "yes";
                 return true;
@@ -136,20 +142,28 @@ window.addEventListener('DOMContentLoaded', () => {
           console.error("Error checking zip code:", error);
         }
 
-        // New simplified routing
-        var redirectPath = '/join-waitlist';
+        var originURL = window.location.origin;
+        var redirectPath = "/join-waitlist"; // Default path
+
+        // Handle different market statuses
         if (marketStatus === "yes") {
-          redirectPath = '/join-now';
+          if (useNewOnboarding) {
+            originURL =
+              "https://account.basepowercompany.com/register/S1XeGMjm";
+            redirectPath = "";
+          } else {
+            redirectPath = "/join-now";
+          }
         } else if (marketStatus === "preorder") {
-          redirectPath = '/join-soon';
+          redirectPath = "/join-soon";
         } else if (marketStatus === "houston") {
-          redirectPath = '/join-now-htx';
+          redirectPath = "/join-now-htx";
         }
 
         // Keep param handling for analytics
-        var url = new URL(redirectPath, window.location.origin);
+        var url = new URL(redirectPath, originURL);
         var currentParams = new URLSearchParams(window.location.search);
-        
+
         var selectedParams = {
           gclid: currentParams.get("gclid"),
           utm_source: currentParams.get("utm_source"),
@@ -165,7 +179,9 @@ window.addEventListener('DOMContentLoaded', () => {
           external_url: addressData?.externalUrl || "",
           house_number: addressData?.houseNumber || "",
           street: addressData?.street || "",
-          street_address: `${addressData?.houseNumber || ""} ${addressData?.street || ""}`.trim(),
+          street_address: `${addressData?.houseNumber || ""} ${
+            addressData?.street || ""
+          }`.trim(),
           street_2: addressData?.street_2 || "",
           city: addressData?.city || "",
           county: addressData?.county || "",
@@ -184,7 +200,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
         url.search = new URLSearchParams(filteredParams).toString();
-        url = updateTypeformLink(url);
         window.location.href = url.toString();
       },
     });
@@ -207,7 +222,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Always use new routing
     var redirectToSignupForm = true;
     var useTypeformSignUp = true;
-    
+
     BasePreorderApp.initializeZipCode({
       targetElAddressInput: document.getElementById("zip-code-entry"),
       targetPanel: "#popup-form",
@@ -219,7 +234,8 @@ window.addEventListener('DOMContentLoaded', () => {
       querySelectorClickToOpenForm: '[data-preorder="open"]',
       addressCtaText: "Check availability",
       googleSheetConfig: {
-        zipsCsvUrl: "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
+        zipsCsvUrl:
+          "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
       },
       // hubspot
       hsFormSuccess: {
@@ -256,7 +272,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
         var marketStatus = "no";
         try {
-          const response = await fetch("https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv");
+          const response = await fetch(
+            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
+          );
           const csvText = await response.text();
           const lines = csvText.split("\n");
 
@@ -264,10 +282,13 @@ window.addEventListener('DOMContentLoaded', () => {
             const columns = line.split(",");
             if (columns[1]?.trim() === addressData?.postalCode?.trim()) {
               // Check for yes or houston (both count as "yes")
-              if (columns[4]?.trim() === "yes" || columns[4]?.trim() === "houston") {
+              if (
+                columns[4]?.trim() === "yes" ||
+                columns[4]?.trim() === "houston"
+              ) {
                 marketStatus = "yes";
                 return true;
-              } 
+              }
               // Check for preorder
               else if (columns[4]?.trim() === "preorder") {
                 marketStatus = "preorder";
@@ -280,20 +301,20 @@ window.addEventListener('DOMContentLoaded', () => {
           console.error("Error checking zip code:", error);
         }
 
-        console.log('Market status determined:', marketStatus);
+        console.log("Market status determined:", marketStatus);
 
         // New simplified routing
-        var redirectPath = '/not-available';
+        var redirectPath = "/not-available";
         if (marketStatus === "yes") {
-          redirectPath = '/available-now';
+          redirectPath = "/available-now";
         } else if (marketStatus === "preorder") {
-          redirectPath = '/available-soon';
+          redirectPath = "/available-soon";
         }
 
         // Keep param handling for analytics
-        var url = new URL(redirectPath, window.location.origin);
+        var url = new URL(redirectPath, originURL);
         var currentParams = new URLSearchParams(window.location.search);
-        
+
         var selectedParams = {
           zip: addressData?.postalCode || "", // Add zip code to URL params
           gclid: currentParams.get("gclid"),
@@ -303,7 +324,7 @@ window.addEventListener('DOMContentLoaded', () => {
           utm_term: currentParams.get("utm_term"),
           utm_content: currentParams.get("utm_content"),
           referrer_name: currentParams.get("referrer_name"),
-          person_id: posthog.get_distinct_id()
+          person_id: posthog.get_distinct_id(),
         };
 
         // Filter out empty params
@@ -314,7 +335,12 @@ window.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        console.log('Redirecting to:', redirectPath, 'with params:', filteredParams);
+        console.log(
+          "Redirecting to:",
+          redirectPath,
+          "with params:",
+          filteredParams
+        );
 
         url.search = new URLSearchParams(filteredParams).toString();
         url = updateTypeformLink(url);
