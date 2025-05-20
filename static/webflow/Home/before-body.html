@@ -146,20 +146,20 @@
         var redirectPath = "/join-waitlist";
 
         if (useNewOnboarding) {
-          originURL = "https://account.basepowercompany.com/register";
-          redirectPath = "/LKhM3Irh"; // Default path, waitlist
+          originURL = "https://account.basepowercompany.com";
+          redirectPath = "/register/LKhM3Irh"; // Default path, waitlist
         }
 
         // Handle different market statuses
         if (marketStatus === "yes" || marketStatus === "houston") {
           if (useNewOnboarding) {
-            redirectPath = "/S1XeGMjm"; // live markets
+            redirectPath = "/register/S1XeGMjm"; // live markets
           } else {
             redirectPath = "/join-now";
           }
         } else if (marketStatus === "preorder") {
           if (useNewOnboarding) {
-            redirectPath = "/SCiqS9XF"; // preorder markets
+            redirectPath = "/register/SCiqS9XF"; // preorder markets
           } else {
             redirectPath = "/join-soon";
           }
