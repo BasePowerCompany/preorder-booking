@@ -68,7 +68,6 @@
           posthog.capture("user-submit-address-form");
         }
       },
-      hidePanelEl: redirectToSignupForm,
       onAddressSubmitSuccess: async (addressData, leadType, zipConfig) => {
         gtag("event", "address-submit", { leadType, addressData, zipConfig });
         window.hubspotAddressData = addressData;

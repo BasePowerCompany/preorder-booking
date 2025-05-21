@@ -14,5 +14,4 @@ export interface PreorderAppConfig {
   addressCtaText?: string;
   onAddressSelect?: () => void;
   onAddressSubmitSuccess?: OnAddressSubmitSuccess;
-  hidePanelEl?: boolean;
 }

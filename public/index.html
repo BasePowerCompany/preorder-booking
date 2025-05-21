@@ -5616,100 +5616,8 @@
 />-->
 
     <!-- Functionality scripts -->
-
-    <script
-      charset="utf-8"
-      type="text/javascript"
-      src="//js-eu1.hsforms.net/forms/embed/v2.js"
-    ></script>
-
-    /* Embed.js was commented out in the older index.html, I suspect v2.js
-    replaced it, or at the very least it's no longer being used. Hiding it does
-    not prevent the browser from requesting it, so I have renamed the file to
-    prevent it from loading.*/
-
     <script defer src="/build/bundle.js"></script>
 
-    <!-- hubspot form submit controls -->
-    <script type="text/javascript">
-      const hsOnFormSubmitted = (form, args) => {
-        if (posthog) {
-          posthog.capture(
-            "user_submitted_hubspot_form",
-            {},
-            { send_instantly: true },
-          );
-        }
-        const confirmationUrlWithParams = (base) => {
-          const address =
-            window.hubspotAddressData &&
-            window.hubspotAddressData.formattedAddress
-              ? window.hubspotAddressData.formattedAddress
-              : "";
-          const firstname =
-            args.submissionValues && args.submissionValues.firstname
-              ? args.submissionValues.firstname
-              : "";
-          const lastname =
-            args.submissionValues && args.submissionValues.lastname
-              ? args.submissionValues.lastname
-              : "";
-          const email =
-            args.submissionValues && args.submissionValues.email
-              ? args.submissionValues.email
-              : "";
-          const promo_code =
-            args.submissionValues && args.submissionValues.promo_code
-              ? args.submissionValues.promo_code
-              : "";
-          const name = firstname + " " + lastname;
-
-          return (
-            base +
-            "?address=" +
-            encodeURIComponent(address) +
-            "&name=" +
-            encodeURIComponent(name) +
-            "&email=" +
-            encodeURIComponent(email) +
-            "&promo_code=" +
-            encodeURIComponent(promo_code)
-          );
-        };
-        console.log(confirmationUrlWithParams("/solar-confirmation-booking"));
-
-        localStorage.setItem("email", args.submissionValues.email);
-
-        var servingNow = args?.submissionValues?.zipConfig?.servingNow;
-        var isHomeowner = args?.submissionValues?.homeowner;
-
-        // redirect is now controlled from here
-        if (["preorder"].includes(servingNow) && isHomeowner === "Yes") {
-          window.location.href = confirmationUrlWithParams(
-            "/confirmation-preorder",
-          );
-        } else if (servingNow === "install" && isHomeowner === "Yes") {
-          window.location.href = confirmationUrlWithParams("/reserve-battery");
-        } else if (servingNow === "rep" && isHomeowner === "Yes") {
-          window.location.href = confirmationUrlWithParams("/reserve-rep");
-        } else if (servingNow === "500install" && isHomeowner === "Yes") {
-          window.location.href = confirmationUrlWithParams(
-            "/reserve-battery-500",
-          );
-        } else if (servingNow === "fort worth" && isHomeowner === "Yes") {
-          window.location.href = confirmationUrlWithParams(
-            "/confirmation-fort-worth",
-          );
-        } else if (servingNow === "yes" && isHomeowner === "Yes") {
-          window.location.href = confirmationUrlWithParams("/reserve-now");
-        } else if (isHomeowner === "No") {
-          window.location.href = "/unqualified";
-        } else {
-          window.location.href = "/confirmation";
-        }
-      };
-      window.hsOnFormSubmitted = hsOnFormSubmitted;
-    </script>
 
     <!-- Pre-order app init -->
     <script>
@@ -5720,13 +5628,6 @@
             document.getElementById("hero-address-entry"),
           ],
           googlePublicApiKey: "AIzaSyB0o_nPI-xjHYKg7KB0bl87Yhnf2ng9Nsg",
-          targetPanel: "#popup-form",
-          targetAddressPanel: "#address-popup",
-          targetAvailableState: "#preorder-base",
-          targetNotAvailableState: "#not-available",
-          targetStateContainer: "#popup-form .form-box_holder",
-          targetAvailableText: `#preorder-availability`,
-          targetDisplayAddress: `#service-address`,
           querySelectorClickToOpenForm: '[data-preorder="open"]',
           googleSheetConfig: {
             zipsCsvUrl:

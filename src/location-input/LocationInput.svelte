@@ -55,30 +55,24 @@
       errorMessage = "Please enter a full address.";
       return;
     }
-    if (
-      !selectedAddress.postalCode ||
-      !selectedAddress.houseNumber ||
-      !selectedAddress.street
-    ) {
+
+    if (!selectedAddress.postalCode || !selectedAddress.houseNumber || !selectedAddress.street) {
       errorMessage = "Please enter a full address.";
       return;
     }
 
-    if (!hidePanelEl) {
-      fadeIn(panelEl);
-    }
+    fadeIn(panelEl);
     displayBlock(stateContainerEl);
     displayNone(addressPanelEl);
-
     const targetDisplayAddressEl = document.querySelector(targetDisplayAddress);
     targetDisplayAddressEl.innerHTML = selectedAddress.formattedAddress;
-
     displayBlock(targetAvailableStateEl);
     displayNone(targetNotAvailableStateEl);
-    addressState.update({
-      selectedAddress,
-    });
-    onAddressSubmitSuccess?.(selectedAddress);
+    addressState.update({ selectedAddress });
+
+    onAddressSubmitSuccess === null || onAddressSubmitSuccess === void 0
+    ? void 0
+    : onAddressSubmitSuccess(selectedAddress);
   }
 
   function handlePlaceSelect() {
@@ -127,7 +121,6 @@
   export let targetNotAvailableStateEl: HTMLDivElement;
   export let onAddressSelect: (data: ParsedPlaceResult) => void;
   export let onAddressSubmitSuccess: (data: ParsedPlaceResult) => void;
-  export let hidePanelEl: boolean = false;
 
   $: inputErrorMessage = "";
   $: selectedAddress = null;

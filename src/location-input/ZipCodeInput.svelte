@@ -9,8 +9,6 @@
   export let panelEl: HTMLDivElement | null = null;
   export let stateContainerEl: HTMLDivElement | null = null;
   export let addressPanelEl: HTMLDivElement | null = null;
-  
-  export let hidePanelEl: boolean = false;
 
   onMount(() => {
     const inputContainer = document.querySelector(".input-zip-container") as HTMLElement;
@@ -61,8 +59,8 @@
       return;
     }
 
-    // Only try to show panel if it exists and we're not hiding it
-    if (panelEl && !hidePanelEl) {
+    // Only try to show panel if it exists
+    if (panelEl) {
       fadeIn(panelEl);
     }
 
@@ -97,7 +95,7 @@
     // Always update state and call success handler
     addressState.update({
       selectedAddress: minimalAddress,
-      zipConfig: null,
+      zipConfig: null
     });
 
     onAddressSubmitSuccess?.(
