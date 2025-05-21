@@ -3,7 +3,7 @@
 import type { ParsedPlaceResult } from "./location-input/googlePlace/utils";
 import type { StoredZipDataItem } from "./location-input/zipData/types";
 
-const hsFormWindowState = (key: string) => ({
+const createWindowState = (key: string) => ({
   update: (data: {
     zipConfig?: StoredZipDataItem;
     selectedAddress?: ParsedPlaceResult;
@@ -24,5 +24,5 @@ const hsFormWindowState = (key: string) => ({
   },
 });
 
-export const hsFormStateBooking = hsFormWindowState("hsFormStateBooking");
-export const hsFormStateNewsletter = hsFormWindowState("hsFormStateNewsletter");
+export const addressState = createWindowState("addressState");
+export const newsletterState = createWindowState("newsletterState");

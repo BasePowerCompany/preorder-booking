@@ -9,10 +9,23 @@ import typescript from "@rollup/plugin-typescript";
 import css from "rollup-plugin-css-only";
 import replace from "@rollup/plugin-replace";
 import * as sass from 'sass';
+import fs from 'fs';
+import path from 'path';
 
 const production = !process.env.ROLLUP_WATCH;
 const ASSET_URL =
   "https://cdn.jsdelivr.net/gh/accora-care/configurators@latest/public";
+
+function copyBeforeBodyScript() {
+  return {
+    name: 'copy-before-body-script',
+    writeBundle() {
+      const sourcePath = path.resolve('static/webflow/Home/before-body.html');
+      const targetPath = path.resolve('public/preorder-app/before-body.html');
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+  };
+}
 
 function serve() {
   let server;
@@ -41,14 +54,16 @@ function serve() {
 
 const createRollupConfigBase = (foo) => {
   const defaultConfig = {
-    input: "src/main.ts",
+    input: "src/embed.ts",
     output: {
       sourcemap: true,
-      format: "iife",
-      name: "app",
-      file: "public/build/bundle.js",
+      format: "umd",
+      exports: "named",
+      name: "BasePreorderApp",
+      file: "public/preorder-app/embed.js",
     },
     plugins: [
+      copyBeforeBodyScript(),
       svelteSVG({
         // optional SVGO options
         // pass empty object to enable defaults

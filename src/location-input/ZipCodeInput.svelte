@@ -1,28 +1,18 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { getZipStore } from "./zipData/zipStore";
-  import type { SheetDataConfig, StoredZipDataItem } from "./zipData/types";
   import type { OnAddressSubmitSuccess } from "../types";
   import { displayBlock, displayNone, fadeIn } from "../visibilityUtils";
-  import { setHiddenHubspotInputs } from "./hubspot/hsFormUtils";
-  import { hsFormStateBooking } from "../windowVars";
+  import { addressState } from "../windowVars";
 
-  export let googleSheetConfig: SheetDataConfig;
   export let addressCtaText: string = "See if I qualify";
   export let onAddressSubmitSuccess: OnAddressSubmitSuccess = () => {};
   export let panelEl: HTMLDivElement | null = null;
   export let stateContainerEl: HTMLDivElement | null = null;
   export let addressPanelEl: HTMLDivElement | null = null;
-  export let targetAvailableStateEl: HTMLDivElement | null = null;
-  export let targetNotAvailableStateEl: HTMLDivElement | null = null;
-  export let targetAvailableText: string | null = null;
-  export let targetDisplayAddress: string | null = null;
+  
   export let hidePanelEl: boolean = false;
 
-  const { store: zipStore, load: loadZips } = getZipStore(googleSheetConfig);
-
-  onMount(async () => {
-    loadZips();
+  onMount(() => {
     const inputContainer = document.querySelector(".input-zip-container") as HTMLElement;
     const focusOverlay = document.querySelector(".focus_overlay") as HTMLElement;
     const input = document.querySelector(".zip-search-input") as HTMLInputElement;
@@ -71,20 +61,20 @@
       return;
     }
 
+    // Only try to show panel if it exists and we're not hiding it
     if (panelEl && !hidePanelEl) {
       fadeIn(panelEl);
     }
+
+    // Only try to show/hide state container if it exists
     if (stateContainerEl) {
       displayBlock(stateContainerEl);
     }
+
+    // Only try to hide address panel if it exists
     if (addressPanelEl) {
       displayNone(addressPanelEl);
     }
-
-    const foundZipItem: StoredZipDataItem | null =
-      $zipStore.find((zipItem) => {
-        return zipItem.zip === zipCode;
-      }) || null;
 
     // Create a minimal address object for consistency with LocationInput
     const minimalAddress = {
@@ -97,60 +87,23 @@
       street_2: "",
       city: "",
       county: "",
-      stateShort: foundZipItem?.stateShort || "",
+      stateShort: "",
       stateLong: "",
       countryCode: "US",
       countryLong: "United States",
       postalCode: zipCode
     };
 
-    if (foundZipItem) {
-      if (targetAvailableText) {
-        const targetAvailableTextEl = document.querySelector(targetAvailableText);
-        if (targetAvailableTextEl) {
-          targetAvailableTextEl.innerHTML = foundZipItem.availability;
-        }
-      }
-
-      if (targetAvailableStateEl) {
-        displayBlock(targetAvailableStateEl);
-      }
-      if (targetNotAvailableStateEl) {
-        displayNone(targetNotAvailableStateEl);
-      }
-
-      if (window.hsFormPreorder) {
-        setHiddenHubspotInputs(
-          window.hsFormPreorder,
-          minimalAddress,
-          foundZipItem,
-        );
-      }
-      hsFormStateBooking.update({
-        selectedAddress: minimalAddress,
-        zipConfig: foundZipItem,
-      });
-    } else {
-      if (targetAvailableStateEl) {
-        displayNone(targetAvailableStateEl);
-      }
-      if (targetNotAvailableStateEl) {
-        displayBlock(targetNotAvailableStateEl);
-      }
-
-      if (window.hsFormNewsletter) {
-        setHiddenHubspotInputs(window.hsFormNewsletter, minimalAddress);
-      }
-      hsFormStateBooking.update({
-        selectedAddress: minimalAddress,
-        zipConfig: null,
-      });
-    }
+    // Always update state and call success handler
+    addressState.update({
+      selectedAddress: minimalAddress,
+      zipConfig: null,
+    });
 
     onAddressSubmitSuccess?.(
       minimalAddress,
-      foundZipItem ? "lead-preorder-form" : "lead-newsletter-form",
-      foundZipItem
+      "lead-preorder-form",
+      null
     );
   };
 </script>

@@ -58,49 +58,11 @@
         document.getElementById("hero-address-entry"),
       ],
       googlePublicApiKey: "AIzaSyB0o_nPI-xjHYKg7KB0bl87Yhnf2ng9Nsg",
-      targetPanel: "#popup-form",
-      targetAddressPanel: "#address-popup",
-      targetAvailableState: "#preorder-base",
-      targetNotAvailableState: "#not-available",
-      targetStateContainer: "#popup-form .form-box_holder",
-      targetAvailableText: `#preorder-availability`,
-      targetDisplayAddress: `#service-address`,
       querySelectorClickToOpenForm: '[data-preorder="open"]',
       addressCtaText: "Check availability",
       googleSheetConfig: {
         zipsCsvUrl:
-          "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
-      },
-      // hubspot
-      hsFormSuccess: {
-        target: "#hubspot-preorder-form",
-        region: "na1",
-        portalId: "43873875",
-        formId: "a41c83a1-a371-4080-be84-5699814bc294",
-        onFormSubmit: () => {
-          if (posthog) {
-            posthog.capture("user-submit-hubspot-form");
-          }
-          gtag("event", "preorder-submitted");
-        },
-        onFormSubmitted: () => {
-          // Default to newsletter confirmation
-          window.location.href = "/newsletter-confirmation";
-        },
-      },
-      hsFormNewsletter: {
-        target: "#hubspot-email-form",
-        region: "na1",
-        portalId: "43873875",
-        formId: "bdfdc2d3-1e91-44e7-a477-02a68a93d0f9",
-        onFormSubmit: () => {
-          gtag("event", "newsletter-submitted");
-        },
-        onFormSubmitted: () => {
-          // redirect is now controlled from here
-          window.location.href = "/newsletter-confirmation";
-        },
-      },
+          "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"},
       onAddressSelect: () => {
         if (posthog) {
           posthog.capture("user-submit-address-form");
@@ -224,57 +186,14 @@
 <!-- ZIP code app init -->
 <script>
   posthog.onFeatureFlags(function () {
-    // Always use new routing
-    var redirectToSignupForm = true;
-    var useTypeformSignUp = true;
-
     // Initialize ZIP code input independently
     if (document.getElementById("zip-code-entry")) {
       BasePreorderApp.initializeZipCode({
         targetElAddressInput: document.getElementById("zip-code-entry"),
-        targetPanel: "#popup-form",
-        targetAddressPanel: "#address-popup",
-        targetAvailableState: "#preorder-base",
-        targetNotAvailableState: "#not-available",
-        targetStateContainer: "#popup-form .form-box_holder",
-        targetAvailableText: `#preorder-availability`,
         querySelectorClickToOpenForm: '[data-preorder="open"]',
         addressCtaText: "Check availability",
-        googleSheetConfig: {
-          zipsCsvUrl:
-            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
-        },
-        // hubspot
-        hsFormSuccess: {
-          target: "#hubspot-preorder-form",
-          region: "na1",
-          portalId: "43873875",
-          formId: "a41c83a1-a371-4080-be84-5699814bc294",
-          onFormSubmit: () => {
-            if (posthog) {
-              posthog.capture("user-submit-hubspot-form-zip");
-            }
-            gtag("event", "preorder-submitted-zip");
-          },
-          onFormSubmitted: () => {
-            window.location.href = "/newsletter-confirmation";
-          },
-        },
-        hsFormNewsletter: {
-          target: "#hubspot-email-form",
-          region: "na1",
-          portalId: "43873875",
-          formId: "bdfdc2d3-1e91-44e7-a477-02a68a93d0f9",
-          onFormSubmit: () => {
-            gtag("event", "newsletter-submitted-zip");
-          },
-          onFormSubmitted: () => {
-            window.location.href = "/newsletter-confirmation";
-          },
-        },
-        hidePanelEl: redirectToSignupForm,
-        onAddressSubmitSuccess: async (addressData, leadType, zipConfig) => {
-          gtag("event", "zip-submit", { leadType, addressData, zipConfig });
+        onAddressSubmitSuccess: async (addressData) => {
+          gtag("event", "zip-submit", { addressData });
           window.hubspotAddressData = addressData;
 
           var marketStatus = "no";

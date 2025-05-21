@@ -6,13 +6,12 @@
   import GooglePlaceAutocomplete from "./googlePlace/GooglePlaceAutocomplete.svelte";
   import type { ParsedPlaceResult } from "./googlePlace/utils";
   import { parsePlaceResult } from "./googlePlace/utils";
-  import { setHiddenHubspotInputs } from "./hubspot/hsFormUtils";
   import { displayBlock, displayNone, fadeIn } from "../visibilityUtils";
   import { onMount } from "svelte";
   import { getZipStore } from "./zipData/zipStore";
   import type { SheetDataConfig, StoredZipDataItem } from "./zipData/types";
   import type { OnAddressSubmitSuccess } from "../types";
-  import { hsFormStateBooking } from "../windowVars";
+  import { addressState } from "../windowVars";
 
   export let targetAvailableText: string;
   export let targetDisplayAddress: string;
@@ -90,12 +89,7 @@
 
       displayBlock(targetAvailableStateEl);
       displayNone(targetNotAvailableStateEl);
-      setHiddenHubspotInputs(
-        window.hsFormPreorder,
-        selectedAddress,
-        foundZipItem,
-      );
-      hsFormStateBooking.update({
+      addressState.update({
         selectedAddress,
         zipConfig: foundZipItem,
       });
@@ -107,8 +101,7 @@
     } else {
       displayBlock(targetNotAvailableStateEl);
       displayNone(targetAvailableStateEl);
-      setHiddenHubspotInputs(window.hsFormNewsletter, selectedAddress);
-      hsFormStateBooking.update({
+      addressState.update({
         selectedAddress,
         zipConfig: null,
       });
@@ -155,13 +148,6 @@
   {/if}
 </div>
 <div class="focus_overlay"></div>
-
-<svelte:head>
-  <script
-    charset="utf-8"
-    src="//js-eu1.hsforms.net/forms/embed/v2.js"
-  ></script>
-</svelte:head>
 
 <style lang="scss" global>
   .input-address-container {
