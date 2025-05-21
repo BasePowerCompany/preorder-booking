@@ -1,2 +1,2342 @@
-!function(e){"function"==typeof define&&define.amd?define(e):e()}((function(){"use strict";const e=e=>!!e,t=["zip","state","country","city","address","street_2","formatted_address","postal_code_availability","postal_code_availability_serving_now"],n=(e,t,n)=>{try{e.querySelector(`input[name="${t}"]`).value=n}catch(e){console.log("cannot set field value",t,n)}},o=(t,o,r)=>{n(t,"zip",o.postalCode),n(t,"state",o.stateShort),n(t,"country",o.countryCode),n(t,"city",o.city),n(t,"street_2",o.street_2),n(t,"address",[o.houseNumber,o.street].filter(e).join(" ")),n(t,"formatted_address",o.formattedAddress),r&&(n(t,"postal_code_availability",r.availability),n(t,"postal_code_availability_serving_now",r.servingNow))},r=e=>{t.forEach((t=>((e,t)=>{try{e.querySelector(`input[name="${t}"]`).parentElement.parentElement.style.display="none"}catch(e){console.log("cannot hide field",t)}})(e,t)))},s=e=>{r(e),e.appendChild((()=>{let e='\n  html, body, input, button, label, select {\n    font-family: PP Neue Montreal Variable, sans-serif !important,\n  }\n  input, button {\n    -webkit-appearance:none;\n  }\n  .form-preview-container {\n    background-color: #ffffff;\n  }\n  /* reset */\n  form[class*="hs-form"] *,\n  form[class*="hs-form"] *::before,\n  form[class*="hs-form"] *::after {\n    box-sizing: border-box;\n  }\n  form[class*="hs-form"] {\n    display: flex;\n    flex-wrap: wrap;\n    flex-direction: column;\n    gap: 1rem;\n    font-family: PP Neue Montreal Variable, sans-serif,\n  }\n  form[class*="hs-form"] fieldset { max-width: none; display: flex; flex-wrap: wrap; }\n  form[class*="hs-form"] fieldset > .field.hs-form-field { width: 1px; flex-grow: 1; min-width: 230px; }\n  form[class*="hs-form"] .field.hs-form-field { flex-grow: 1; min-width: 230px; }\n  form[class*="hs-form"] .field.hs-form-field .input { margin-right: 0; }\n  form[class*="hs-form"] .field.hs-form-field .input input,\n  form[class*="hs-form"] .field.hs-form-field .input select,\n  form[class*="hs-form"] .field.hs-form-field .input textarea\n   {\n    width: 100%;\n    resize: none;\n    background: white;\n    outline: none;\n    border: 1px solid black;\n    transition: .2s all;\n    font-family: PP Neue Montreal Variable, sans-serif,\n  }\n  \n  form[class*="hs-form"] .field.hs-form-field .input textarea {\n    min-height: 150px;\n  }\n  \n  \n  form[class*="hs-form"] fieldset { \n    gap: 1rem 12px; \n  }\n  \n\n  form[class*="hs-form"] .field.hs-form-field .input input,\n  form[class*="hs-form"] .field.hs-form-field .input select {\n    height: 44px;\n    line-height: 44px;\n    padding: 0 24px;\n    border: none;\n  }\n\n  form[class*="hs-form"] .field.hs-form-field .input input,\n  form[class*="hs-form"] .field.hs-form-field .input select,\n  form[class*="hs-form"] .field.hs-form-field .input textarea {\n    font-weight: 400;\n    border-style: solid;\n    font-size: 15px;\n    letter-spacing: 0px;\n    height: 44px;\n    padding: 0 16px !important;\n    border-color: #EFF1F2;\n    color: #090D0FEB;\n    background-color: #EFF1F2;\n    border-width: 0px;\n    border-radius: 12px;\n  }\n  form[class*="hs-form"] .field.hs-form-field .input textarea {\n    height: 150px;\n    padding: 16px !important;\n  }\n\n  form[class*="hs-form"] .field.hs-form-field .input input::placeholder,\n  form[class*="hs-form"] .field.hs-form-field .input select:invalid,\n  form[class*="hs-form"] .field.hs-form-field .input textarea::placeholder {\n    color: #020B0F5C;font-weight: 400;letter-spacing: 0px;\n  }\n\n\n  form[class*="hs-form"] .field.hs-form-field > label {\n    display: block;\n    font-weight: 600;color: #000000;font-size: 15px;margin-bottom: 8px;letter-spacing: 0px;text-transform: capitalize;\n  }\n\n  form[class*="hs-form"] .inputs-list label {\n    display: block;\n    border-style: solid;border-width: 0px;border-radius: 0px;padding: 8px 0px 0px 0px;color: #c95151;border-color: #d02525;font-size: 14px;font-weight: 400;\n  }\n\n\n  form[class*="hs-form"] .actions input[type="submit"] {\n    display: flex;\n    justify-content: center;\n    width: 100%;\n    cursor: pointer;\n    line-height: 44px;\n    outline: none;\n    border: none;\n    transition: .2s all;\n    border-style: solid;\n    color: white;\n    font-weight: 400;font-size: 15px;letter-spacing: 0px;height: 44px;padding: 0 32px;color: white;background-color: #0F9954;border-width: 0px;border-radius: 12px;text-align: center;\n  }\n\n  form[class*="hs-form"] .actions input[type="submit"]:hover {\n    font-size: 15px;\n    background-color: #0F9954;\n  }\n\n  form[class*="hs-form"] .hs_error_rollup {\n    display: none;\n  }\n\n  form[class*="hs-form"] .hs-error-msgs li { list-style: none; margin-left: 0; }\n\n  div[class*="hs-form"].submitted-message {\n    background-color: #6c42e0;border-width: 1px;border-radius: 8px;padding: 16px;text-align: center;color: #ffffff;font-size: 18px;\n  }\n\n  div[class*="hs-form"].submitted-message p {\n    color: #ffffff;\n}';e+='\n.hs-form__virality-link {\n  display: none !important;\n}\n.hs-form .field {\n  margin-bottom: 0 !important;\n}\n\nform[class*="hs-form"] .field.hs-form-field > label {\n  display: none;\n}\n\n.hs_submit.hs-submit .actions {\n  padding: 0 !important;\n  margin: 0 !important;\n}\n\nform[class*="hs-form"] {\n  padding-bottom: 30px;\n}\n\n';const t=document.createElement("style");return t.innerHTML=e.trim(),t})())},l=e=>({update:t=>{try{window[e]=Object.assign(Object.assign({},window[e]),t)}catch(e){}},get:()=>{try{return window[e]}catch(e){return{}}}}),i=l("hsFormStateBooking"),a=l("hsFormStateNewsletter"),c=e=>"0"in e&&"length"in e&&1===e.length?e[0]:e,d=({hsFormSuccess:e,hsFormNewsletter:t})=>{window.hbspt.forms.create(Object.assign(Object.assign({},e),{onFormReady:e=>{const t=c(e);window.hsFormPreorder=t,s(t)},onFormSubmit:t=>{var n;const o=c(t);o.querySelector('input[name="email"]').value,null===(n=e.onFormSubmit)||void 0===n||n.call(e,o)},onFormSubmitted:(t,n)=>{var o;null===(o=e.onFormSubmitted)||void 0===o||o.call(e,t,Object.assign(Object.assign({},n),{submissionValues:Object.assign(Object.assign({},n.submissionValues),i.get())}))}})),window.hbspt.forms.create(Object.assign(Object.assign({},t),{onFormReady:e=>{const t=c(e);window.hsFormNewsletter=t,s(t)},onFormSubmitted:(e,n)=>{var o;null===(o=t.onFormSubmitted)||void 0===o||o.call(t,e,Object.assign(Object.assign({},n),{submissionValues:Object.assign(Object.assign({},n.submissionValues),a.get())}))}}))};function u(){}function f(e,t){for(const n in t)e[n]=t[n];return e}function p(e){return e()}function m(){return Object.create(null)}function h(e){e.forEach(p)}function g(e){return"function"==typeof e}function b(e,t){return e!=e?t==t:e!==t||e&&"object"==typeof e||"function"==typeof e}let y;function v(e,t){return y||(y=document.createElement("a")),y.href=t,e===y.href}function w(e,t,n){e.$$.on_destroy.push(function(e,...t){if(null==e)return u;const n=e.subscribe(...t);return n.unsubscribe?()=>n.unsubscribe():n}(t,n))}function S(e){const t={};for(const n in e)"$"!==n[0]&&(t[n]=e[n]);return t}const x="undefined"!=typeof window?window:"undefined"!=typeof globalThis?globalThis:global;function E(e,t){e.appendChild(t)}function A(e,t,n){e.insertBefore(t,n||null)}function _(e){e.parentNode&&e.parentNode.removeChild(e)}function $(e){return document.createElement(e)}function C(e){return document.createTextNode(e)}function P(){return C(" ")}function k(e,t,n,o){return e.addEventListener(t,n,o),()=>e.removeEventListener(t,n,o)}function z(e,t,n){null==n?e.removeAttribute(t):e.getAttribute(t)!==n&&e.setAttribute(t,n)}function F(e,t){t=""+t,e.data!==t&&(e.data=t)}function j(e,t,n){e.classList[n?"add":"remove"](t)}let T;function q(e){T=e}function N(){if(!T)throw new Error("Function called outside component initialization");return T}function O(e){N().$$.on_mount.push(e)}function L(){const e=N();return(t,n,{cancelable:o=!1}={})=>{const r=e.$$.callbacks[t];if(r){const s=function(e,t,{bubbles:n=!1,cancelable:o=!1}={}){const r=document.createEvent("CustomEvent");return r.initCustomEvent(e,n,o,t),r}(t,n,{cancelable:o});return r.slice().forEach((t=>{t.call(e,s)})),!s.defaultPrevented}return!0}}const B=[],D=[];let I=[];const K=[],Q=Promise.resolve();let M=!1;function V(e){I.push(e)}const R=new Set;let U=0;function H(){if(0!==U)return;const e=T;do{try{for(;U<B.length;){const e=B[U];U++,q(e),Y(e.$$)}}catch(e){throw B.length=0,U=0,e}for(q(null),B.length=0,U=0;D.length;)D.pop()();for(let e=0;e<I.length;e+=1){const t=I[e];R.has(t)||(R.add(t),t())}I.length=0}while(B.length);for(;K.length;)K.pop()();M=!1,R.clear(),q(e)}function Y(e){if(null!==e.fragment){e.update(),h(e.before_update);const t=e.dirty;e.dirty=[-1],e.fragment&&e.fragment.p(e.ctx,t),e.after_update.forEach(V)}}const Z=new Set;function G(e,t){e&&e.i&&(Z.delete(e),e.i(t))}function J(e,t,n,o){const{fragment:r,after_update:s}=e.$$;r&&r.m(t,n),o||V((()=>{const t=e.$$.on_mount.map(p).filter(g);e.$$.on_destroy?e.$$.on_destroy.push(...t):h(t),e.$$.on_mount=[]})),s.forEach(V)}function W(e,t){const n=e.$$;null!==n.fragment&&(!function(e){const t=[],n=[];I.forEach((o=>-1===e.indexOf(o)?t.push(o):n.push(o))),n.forEach((e=>e())),I=t}(n.after_update),h(n.on_destroy),n.fragment&&n.fragment.d(t),n.on_destroy=n.fragment=null,n.ctx=[])}function X(e,t){-1===e.$$.dirty[0]&&(B.push(e),M||(M=!0,Q.then(H)),e.$$.dirty.fill(0)),e.$$.dirty[t/31|0]|=1<<t%31}function ee(e,t,n,o,r,s,l,i=[-1]){const a=T;q(e);const c=e.$$={fragment:null,ctx:[],props:s,update:u,not_equal:r,bound:m(),on_mount:[],on_destroy:[],on_disconnect:[],before_update:[],after_update:[],context:new Map(t.context||(a?a.$$.context:[])),callbacks:m(),dirty:i,skip_bound:!1,root:t.target||a.$$.root};l&&l(c.root);let d=!1;if(c.ctx=n?n(e,t.props||{},((t,n,...o)=>{const s=o.length?o[0]:n;return c.ctx&&r(c.ctx[t],c.ctx[t]=s)&&(!c.skip_bound&&c.bound[t]&&c.bound[t](s),d&&X(e,t)),n})):[],c.update(),d=!0,h(c.before_update),c.fragment=!!o&&o(c.ctx),t.target){if(t.hydrate){const e=function(e){return Array.from(e.childNodes)}(t.target);c.fragment&&c.fragment.l(e),e.forEach(_)}else c.fragment&&c.fragment.c();t.intro&&G(e.$$.fragment),J(e,t.target,t.anchor,t.customElement),H()}q(a)}class te{$destroy(){W(this,1),this.$destroy=u}$on(e,t){if(!g(t))return u;const n=this.$$.callbacks[e]||(this.$$.callbacks[e]=[]);return n.push(t),()=>{const e=n.indexOf(t);-1!==e&&n.splice(e,1)}}$set(e){var t;this.$$set&&(t=e,0!==Object.keys(t).length)&&(this.$$.skip_bound=!0,this.$$set(e),this.$$.skip_bound=!1)}}let ne=!1;const oe=[];function re(e,t){if(window.google&&window.google.maps&&window.google.maps.places)return void t();if(t&&oe.push(t),ne)return;ne=!0;const n=document.createElement("script");n.async=!0,n.defer=!0,n.onload=se,n.src=`https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(e)}&libraries=places`,n.type="text/javascript",document.head.appendChild(n)}function se(){let e;for(ne=!1;e=oe.pop();)e()}function le(e){let t,n,o,r;return{c(){t=$("input"),z(t,"class",n=e[7].class),z(t,"placeholder",e[0]),t.value=e[1],t.required=e[2],z(t,"pattern",e[3]),j(t,"input",!0)},m(n,s){A(n,t,s),e[11](t),o||(r=[k(t,"change",e[5]),k(t,"keydown",e[6])],o=!0)},p(e,[o]){128&o&&n!==(n=e[7].class)&&z(t,"class",n),1&o&&z(t,"placeholder",e[0]),2&o&&t.value!==e[1]&&(t.value=e[1]),4&o&&(t.required=e[2]),8&o&&z(t,"pattern",e[3]),128&o&&j(t,"input",!0)},i:u,o:u,d(n){n&&_(t),e[11](null),o=!1,h(r)}}}function ie(e,t,n){let o,{apiKey:r}=t,{options:s}=t,{placeholder:l}=t,{value:i=""}=t,{required:a=!1}=t,{pattern:c=""}=t,{onSelect:d}=t;const u=L();let p;function m(){n(4,p.value="",p),h()}function h(){""===p.value&&g(null)}function g(e){o=e&&e.text||"",u("place_changed",e)}return O((()=>{re(r,(()=>{n(8,s.types=["street_address","premise","subpremise","point_of_interest"],s);const e=new google.maps.places.Autocomplete(p,Object.assign({},s));e.addListener("place_changed",(()=>{const t=e.getPlace();(function(e){const t=s&&s.fields||["geometry"];return e.hasOwnProperty(t[0])})(t)&&(d(t),g({place:t,text:p.value}))})),u("ready"),setTimeout((()=>{p.setAttribute("autocomplete","one-time-code")}),2e3)}))})),e.$$set=e=>{n(7,t=f(f({},t),S(e))),"apiKey"in e&&n(9,r=e.apiKey),"options"in e&&n(8,s=e.options),"placeholder"in e&&n(0,l=e.placeholder),"value"in e&&n(1,i=e.value),"required"in e&&n(2,a=e.required),"pattern"in e&&n(3,c=e.pattern),"onSelect"in e&&n(10,d=e.onSelect)},e.$$.update=()=>{2&e.$$.dirty&&(o=i||"")},t=S(t),[l,i,a,c,p,h,function(e){const t=document.getElementsByClassName("pac-item").length;if("Enter"===e.key||"Tab"===e.key)if(t){document.getElementsByClassName("pac-item-selected").length||function(){const e=new KeyboardEvent("keydown",{key:"ArrowDown",code:"ArrowDown",keyCode:40});p.dispatchEvent(e)}()}else(function(e){return o!==e})(p.value)&&setTimeout(m,10);else"Escape"===e.key&&setTimeout(m,10);t&&"Enter"===e.key&&e.preventDefault()},t,s,r,d,function(e){D[e?"unshift":"push"]((()=>{p=e,n(4,p)}))}]}class ae extends te{constructor(e){super(),ee(this,e,ie,le,b,{apiKey:9,options:8,placeholder:0,value:1,required:2,pattern:3,onSelect:10})}}const ce=e=>{e.style.display="none"},de=(e,t="block")=>{e.style.display=t};function ue(e,t="block"){let n=.1;e.style.opacity="0",e.style.display=t;const o=setInterval((function(){n>=1&&clearInterval(o),e.style.opacity=`${n}`,e.style.filter="alpha(opacity="+100*n+")",n+=.3*n}),1)}function fe(e){let t=1;const n=setInterval((function(){t<=.1&&(clearInterval(n),e.style.display="none"),e.style.opacity=`${t}`,e.style.filter="alpha(opacity="+100*t+")",t-=.3*t}),1)}const pe=[];const me=["stateShort","zip","availability","servingNow"],he=["state_id","zip","Availability","serving_now"];const ge={state_id:"stateShort",zip:"zip",Availability:"availability",serving_now:"servingNow"},be=e=>{const t=e.split("\n");if(t.length<1)return;const[n,...o]=t,r=n.split(",");if(function(e){return he.reduce(((t,n)=>t&&e.includes(n)),!0)}(r))return o.map((e=>{const t={},n=e.split(",");if(r.forEach(((e,o)=>{const r=ge[e];void 0!==r&&(t[r]=`${n[o]}`)})),function(e){const t=Object.keys(e);return me.reduce(((e,n)=>e&&t.includes(n)),!0)}(t))return t;console.warn(`Found invalid deregulated row: ${t}`)}),[]);throw new Error(`Missing required deregulated zip column names: ${r}`)},ye=[],ve=e=>{const t=function(e,t=u){let n;const o=new Set;function r(t){if(b(e,t)&&(e=t,n)){const t=!pe.length;for(const t of o)t[1](),pe.push(t,e);if(t){for(let e=0;e<pe.length;e+=2)pe[e][0](pe[e+1]);pe.length=0}}}return{set:r,update:function(t){r(t(e))},subscribe:function(s,l=u){const i=[s,l];return o.add(i),1===o.size&&(n=t(r)||u),s(e),()=>{o.delete(i),0===o.size&&n&&(n(),n=null)}}}}(ye);return{store:t,load:async()=>{try{const n=await(async e=>{const t=await fetch(e.zipsCsvUrl),n=await(await t.blob()).text();return be(n)})(e);t.set(n)}catch(e){console.error("Cannot load zips",e)}}}},{document:we}=x;function Se(e){let t,n;return{c(){t=$("p"),n=C(e[4]),z(t,"class","preorder-address-error-message")},m(e,o){A(e,t,o),E(t,n)},p(e,t){16&t&&F(n,e[4])},d(e){e&&_(t)}}}function xe(e){let t,n,o,r,s,l,i,a,c,d,u,f,p,m,h,g;l=new ae({props:{class:"location-search-input",apiKey:e[0],placeholder:"Enter your home address",onSelect:e[17],options:{componentRestrictions:{country:"us"}}}});let b=e[4]&&Se(e);return{c(){var g;t=$("div"),n=$("div"),o=$("img"),s=P(),(g=l.$$.fragment)&&g.c(),i=P(),a=$("button"),c=C(e[1]),d=P(),b&&b.c(),u=P(),f=$("div"),p=P(),m=$("script"),v(o.src,r="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.1/public/Base_files/map-pin.svg")||z(o,"src","https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.1/public/Base_files/map-pin.svg"),z(o,"alt","Map pin icon"),z(n,"class","input-address-container"),z(a,"class","submitAddressButton button secondary w-button"),z(t,"class","input-address-wrap"),z(f,"class","focus_overlay"),z(m,"charset","utf-8"),v(m.src,h="//js-eu1.hsforms.net/forms/embed/v2.js")||z(m,"src","//js-eu1.hsforms.net/forms/embed/v2.js")},m(e,r){A(e,t,r),E(t,n),E(n,o),E(n,s),J(l,n,null),E(t,i),E(t,a),E(a,c),E(t,d),b&&b.m(t,null),A(e,u,r),A(e,f,r),A(e,p,r),E(we.head,m),g=!0},p(e,[n]){const o={};1&n&&(o.apiKey=e[0]),28&n&&(o.onSelect=e[17]),l.$set(o),(!g||2&n)&&F(c,e[1]),e[4]?b?b.p(e,n):(b=Se(e),b.c(),b.m(t,null)):b&&(b.d(1),b=null)},i(e){g||(G(l.$$.fragment,e),g=!0)},o(e){!function(e,t,n,o){if(e&&e.o){if(Z.has(e))return;Z.add(e),(void 0).c.push((()=>{Z.delete(e),o&&(n&&e.d(1),o())})),e.o(t)}else o&&o()}(l.$$.fragment,e),g=!1},d(e){e&&_(t),W(l),b&&b.d(),e&&_(u),e&&_(f),e&&_(p),_(m)}}}function Ee(e,t,n){let r,s,{targetAvailableText:l}=t,{targetDisplayAddress:a}=t,{googlePublicApiKey:c}=t,{googleSheetConfig:d}=t,{addressCtaText:u="See if my home qualifies"}=t;const{store:f,load:p}=ve(d);w(e,f,(e=>n(18,s=e))),O((async()=>{p(),jQuery(".input-address-container").on("click",(function(){jQuery(".focus_overlay").show(),jQuery(".input-address-container").addClass("focused"),jQuery("input.location-search-input").attr("placeholder","Enter your home address"),jQuery("button.submitAddressButton").hide()})),jQuery(".input-address-container").on("keydown",(function(){jQuery("input.location-search-input").attr("placeholder","")})),jQuery(".focus_overlay").on("click",(function(){jQuery(".focus_overlay").hide(),jQuery(".submitAddressButton").show(),jQuery(".input-address-container").removeClass("focused")}))}));let m,{panelEl:h}=t,{stateContainerEl:g}=t,{addressPanelEl:b}=t,{targetAvailableStateEl:y}=t,{targetNotAvailableStateEl:v}=t,{onAddressSelect:S}=t,{onAddressSubmitSuccess:x=()=>{}}=t,{hidePanelEl:E=!1}=t;const A=()=>{if(!m)return void n(4,r="Please enter a full address.");if(!m.postalCode||!m.houseNumber||!m.street)return void n(4,r="Please enter a full address.");E||ue(h),de(g),ce(b);document.querySelector(a).innerHTML=m.formattedAddress;const e=s.find((e=>e.zip===m.postalCode))||null;e?(document.querySelector(l).innerHTML=e.availability,de(y),ce(v),o(window.hsFormPreorder,m,e),i.update({selectedAddress:m,zipConfig:e}),null==x||x(m,"lead-preorder-form",e)):(de(v),ce(y),o(window.hsFormNewsletter,m),i.update({selectedAddress:m,zipConfig:null}),null==x||x(m,"lead-newsletter-form",e))};return e.$$set=e=>{"targetAvailableText"in e&&n(7,l=e.targetAvailableText),"targetDisplayAddress"in e&&n(8,a=e.targetDisplayAddress),"googlePublicApiKey"in e&&n(0,c=e.googlePublicApiKey),"googleSheetConfig"in e&&n(9,d=e.googleSheetConfig),"addressCtaText"in e&&n(1,u=e.addressCtaText),"panelEl"in e&&n(10,h=e.panelEl),"stateContainerEl"in e&&n(11,g=e.stateContainerEl),"addressPanelEl"in e&&n(12,b=e.addressPanelEl),"targetAvailableStateEl"in e&&n(13,y=e.targetAvailableStateEl),"targetNotAvailableStateEl"in e&&n(14,v=e.targetNotAvailableStateEl),"onAddressSelect"in e&&n(2,S=e.onAddressSelect),"onAddressSubmitSuccess"in e&&n(15,x=e.onAddressSubmitSuccess),"hidePanelEl"in e&&n(16,E=e.hidePanelEl)},n(4,r=""),n(3,m=void 0),[c,u,S,m,r,f,A,l,a,d,h,g,b,y,v,x,E,e=>{const t=(e=>{console.log(e);const t=(e.address_components||[]).reduce((function(e,t){return t.types.forEach((function(n){e[n]=t})),e}),{}),n=(e,n=!1)=>e in t?n?t[e].short_name:t[e].long_name:null;return{title:e.name,formattedAddress:e.formatted_address,externalId:e.place_id,externalUrl:e.url,houseNumber:n("street_number"),street:n("route"),street_2:[n("floor"),n("subpremise")].filter((e=>!!e)).join(",")||null,city:n("locality")||n("sublocality")||n("sublocality_level_1")||n("neighborhood")||n("administrative_area_level_3")||n("administrative_area_level_2"),county:n("administrative_area_level_2"),stateShort:n("administrative_area_level_1",!0),stateLong:n("administrative_area_level_1"),countryCode:n("country",!0),countryLong:n("country"),postalCode:n("postal_code")}})(e);S?.(t),window.blur(),n(4,r=""),n(3,m=t),A()}]}class Ae extends te{constructor(e){super(),ee(this,e,Ee,xe,b,{targetAvailableText:7,targetDisplayAddress:8,googlePublicApiKey:0,googleSheetConfig:9,addressCtaText:1,panelEl:10,stateContainerEl:11,addressPanelEl:12,targetAvailableStateEl:13,targetNotAvailableStateEl:14,onAddressSelect:2,onAddressSubmitSuccess:15,hidePanelEl:16})}}function _e(e){let t,n,o,r,s,l,i,a,c,d,f,p,m,g,b,y,v,w,S,x,T,q,N,O,L,B,D,I,K=(e[1][0]||"")+"",Q=(e[1][1]||"")+"",M=(e[1][2]||"")+"",V=(e[1][3]||"")+"",R=(e[1][4]||"")+"",U=(e[2]?e[0]:"Enter your zip code")+"";return{c(){t=$("div"),n=$("div"),o=$("div"),r=$("input"),s=P(),l=$("div"),i=$("div"),a=C(K),c=P(),d=$("div"),f=C(Q),p=P(),m=$("div"),g=C(M),b=P(),y=$("div"),v=C(V),w=P(),S=$("div"),x=C(R),T=P(),q=$("button"),N=C(U),L=P(),B=$("div"),z(r,"type","text"),z(r,"inputmode","numeric"),z(r,"pattern","[0-9]*"),z(r,"class","zip-search-input"),z(r,"maxlength","5"),z(i,"class","zip-box"),j(i,"filled",e[1].length>=1),z(d,"class","zip-box"),j(d,"filled",e[1].length>=2),z(m,"class","zip-box"),j(m,"filled",e[1].length>=3),z(y,"class","zip-box"),j(y,"filled",e[1].length>=4),z(S,"class","zip-box"),j(S,"filled",e[1].length>=5),z(l,"class","zip-boxes"),z(o,"class","zip-input-layout"),z(q,"class","submitZipButton button secondary w-button"),q.disabled=O=!e[2],z(n,"class","input-zip-container"),z(t,"class","input-zip-wrap"),z(B,"class","focus_overlay")},m(u,h){A(u,t,h),E(t,n),E(n,o),E(o,r),E(o,s),E(o,l),E(l,i),E(i,a),E(l,c),E(l,d),E(d,f),E(l,p),E(l,m),E(m,g),E(l,b),E(l,y),E(y,v),E(l,w),E(l,S),E(S,x),E(n,T),E(n,q),E(q,N),A(u,L,h),A(u,B,h),D||(I=[k(r,"input",e[4]),k(r,"keydown",e[16]),k(q,"click",e[5])],D=!0)},p(e,[t]){2&t&&K!==(K=(e[1][0]||"")+"")&&F(a,K),2&t&&j(i,"filled",e[1].length>=1),2&t&&Q!==(Q=(e[1][1]||"")+"")&&F(f,Q),2&t&&j(d,"filled",e[1].length>=2),2&t&&M!==(M=(e[1][2]||"")+"")&&F(g,M),2&t&&j(m,"filled",e[1].length>=3),2&t&&V!==(V=(e[1][3]||"")+"")&&F(v,V),2&t&&j(y,"filled",e[1].length>=4),2&t&&R!==(R=(e[1][4]||"")+"")&&F(x,R),2&t&&j(S,"filled",e[1].length>=5),5&t&&U!==(U=(e[2]?e[0]:"Enter your zip code")+"")&&F(N,U),4&t&&O!==(O=!e[2])&&(q.disabled=O)},i:u,o:u,d(e){e&&_(t),e&&_(L),e&&_(B),D=!1,h(I)}}}function $e(e,t,n){let r,s,{googleSheetConfig:l}=t,{addressCtaText:a="See if I qualify"}=t,{onAddressSubmitSuccess:c=()=>{}}=t,{panelEl:d=null}=t,{stateContainerEl:u=null}=t,{addressPanelEl:f=null}=t,{targetAvailableStateEl:p=null}=t,{targetNotAvailableStateEl:m=null}=t,{targetAvailableText:h=null}=t,{targetDisplayAddress:g=null}=t,{hidePanelEl:b=!1}=t;const{store:y,load:v}=ve(l);w(e,y,(e=>n(18,s=e))),O((async()=>{v();const e=document.querySelector(".input-zip-container"),t=document.querySelector(".zip-focus_overlay"),n=document.querySelector(".zip-search-input");e&&t&&(e.addEventListener("click",(()=>{5!==S.length&&(t.style.display="block",e.classList.add("focused")),null==n||n.focus()})),t.addEventListener("click",(()=>{t.style.display="none",e.classList.remove("focused")})))}));let S="";const x=()=>{if(!S)return;if(5!==S.length)return;d&&!b&&ue(d),u&&de(u),f&&ce(f);const e=s.find((e=>e.zip===S))||null,t={title:"",formattedAddress:S,externalId:"",externalUrl:"",houseNumber:"",street:"",street_2:"",city:"",county:"",stateShort:(null==e?void 0:e.stateShort)||"",stateLong:"",countryCode:"US",countryLong:"United States",postalCode:S};if(e){if(h){const t=document.querySelector(h);t&&(t.innerHTML=e.availability)}p&&de(p),m&&ce(m),window.hsFormPreorder&&o(window.hsFormPreorder,t,e),i.update({selectedAddress:t,zipConfig:e})}else p&&ce(p),m&&de(m),window.hsFormNewsletter&&o(window.hsFormNewsletter,t),i.update({selectedAddress:t,zipConfig:null});null==c||c(t,e?"lead-preorder-form":"lead-newsletter-form",e)};return e.$$set=e=>{"googleSheetConfig"in e&&n(6,l=e.googleSheetConfig),"addressCtaText"in e&&n(0,a=e.addressCtaText),"onAddressSubmitSuccess"in e&&n(7,c=e.onAddressSubmitSuccess),"panelEl"in e&&n(8,d=e.panelEl),"stateContainerEl"in e&&n(9,u=e.stateContainerEl),"addressPanelEl"in e&&n(10,f=e.addressPanelEl),"targetAvailableStateEl"in e&&n(11,p=e.targetAvailableStateEl),"targetNotAvailableStateEl"in e&&n(12,m=e.targetNotAvailableStateEl),"targetAvailableText"in e&&n(13,h=e.targetAvailableText),"targetDisplayAddress"in e&&n(14,g=e.targetDisplayAddress),"hidePanelEl"in e&&n(15,b=e.hidePanelEl)},e.$$.update=()=>{2&e.$$.dirty&&n(2,r=5===S.length)},[a,S,r,y,e=>{const t=e.target,o=t.value.replace(/\D/g,"");o.length>5?t.value=o.slice(0,5):t.value=o,n(1,S=t.value)},x,l,c,d,u,f,p,m,h,g,b,e=>"Enter"===e.key&&r&&x()]}class Ce extends te{constructor(e){super(),ee(this,e,$e,_e,b,{googleSheetConfig:6,addressCtaText:0,onAddressSubmitSuccess:7,panelEl:8,stateContainerEl:9,addressPanelEl:10,targetAvailableStateEl:11,targetNotAvailableStateEl:12,targetAvailableText:13,targetDisplayAddress:14,hidePanelEl:15})}}const Pe={initialize:e=>{const{targetElAddressInput:t=document.getElementById("hero-address-entry"),googlePublicApiKey:n,targetPanel:o,targetAddressPanel:r,targetAvailableState:s,targetNotAvailableState:l,targetStateContainer:i,targetAvailableText:a,targetDisplayAddress:c,googleSheetConfig:u,hsFormSuccess:f,hsFormNewsletter:p,querySelectorClickToOpenForm:m,onAddressSelect:h,onAddressSubmitSuccess:g,hidePanelEl:b,addressCtaText:y}=e;d({hsFormSuccess:f,hsFormNewsletter:p});const v=document.querySelector(o),w=document.querySelector(i),S=document.querySelector(r),x=document.querySelector(s),E=document.querySelector(l);document.querySelectorAll(m).forEach((e=>{e.addEventListener("click",(e=>{e.preventDefault(),t.scrollIntoView({behavior:"smooth"});const n=t.getBoundingClientRect().top+window.scrollY-300;window.scrollTo({top:n,behavior:"smooth"}),setTimeout((()=>{t.querySelector("input").focus()}),1e3)}))})),document.querySelectorAll(".close-button").forEach((e=>{e.addEventListener("click",(()=>{fe(v)}))}));return new Ae({target:t,props:{googlePublicApiKey:n,googleSheetConfig:u,targetAvailableText:a,targetDisplayAddress:c,addressPanelEl:S,targetAvailableStateEl:x,stateContainerEl:w,panelEl:v,targetNotAvailableStateEl:E,onAddressSelect:h,onAddressSubmitSuccess:g,hidePanelEl:b,addressCtaText:"See if my home qualifies"}})},initializeZipCode:e=>{const{targetElAddressInput:t=document.getElementById("zip-code-entry"),googlePublicApiKey:n,targetPanel:o,targetAddressPanel:r,targetAvailableState:s,targetNotAvailableState:l,targetStateContainer:i,targetAvailableText:a,targetDisplayAddress:c,googleSheetConfig:u,hsFormSuccess:f,hsFormNewsletter:p,querySelectorClickToOpenForm:m,onAddressSubmitSuccess:h,hidePanelEl:g,addressCtaText:b}=e;(f||p)&&d({hsFormSuccess:f,hsFormNewsletter:p});const y=o?document.querySelector(o):null,v=i?document.querySelector(i):null,w=r?document.querySelector(r):null,S=s?document.querySelector(s):null,x=l?document.querySelector(l):null;m&&document.querySelectorAll(m).forEach((e=>{e.addEventListener("click",(e=>{e.preventDefault(),t.scrollIntoView({behavior:"smooth"});const n=t.getBoundingClientRect().top+window.scrollY-300;window.scrollTo({top:n,behavior:"smooth"}),setTimeout((()=>{t.querySelector("input").focus()}),1e3)}))})),y&&document.querySelectorAll(".close-button").forEach((e=>{e.addEventListener("click",(()=>{fe(y)}))}));return new Ce({target:t,props:{googleSheetConfig:u,onAddressSubmitSuccess:h,addressCtaText:b,panelEl:y,stateContainerEl:v,addressPanelEl:w,targetAvailableStateEl:S,targetNotAvailableStateEl:x,targetAvailableText:a,targetDisplayAddress:c,hidePanelEl:g}})}};window.BasePreorderApp=Pe}));
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
+(function (factory) {
+    typeof define === 'function' && define.amd ? define(factory) :
+    factory();
+})((function () { 'use strict';
+
+    function noop() { }
+    const identity = x => x;
+    function assign(tar, src) {
+        // @ts-ignore
+        for (const k in src)
+            tar[k] = src[k];
+        return tar;
+    }
+    function add_location(element, file, line, column, char) {
+        element.__svelte_meta = {
+            loc: { file, line, column, char }
+        };
+    }
+    function run(fn) {
+        return fn();
+    }
+    function blank_object() {
+        return Object.create(null);
+    }
+    function run_all(fns) {
+        fns.forEach(run);
+    }
+    function is_function(thing) {
+        return typeof thing === 'function';
+    }
+    function safe_not_equal(a, b) {
+        return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
+    }
+    let src_url_equal_anchor;
+    function src_url_equal(element_src, url) {
+        if (!src_url_equal_anchor) {
+            src_url_equal_anchor = document.createElement('a');
+        }
+        src_url_equal_anchor.href = url;
+        return element_src === src_url_equal_anchor.href;
+    }
+    function is_empty(obj) {
+        return Object.keys(obj).length === 0;
+    }
+    function exclude_internal_props(props) {
+        const result = {};
+        for (const k in props)
+            if (k[0] !== '$')
+                result[k] = props[k];
+        return result;
+    }
+    function append(target, node) {
+        target.appendChild(node);
+    }
+    function insert(target, node, anchor) {
+        target.insertBefore(node, anchor || null);
+    }
+    function detach(node) {
+        if (node.parentNode) {
+            node.parentNode.removeChild(node);
+        }
+    }
+    function element(name) {
+        return document.createElement(name);
+    }
+    function text(data) {
+        return document.createTextNode(data);
+    }
+    function space() {
+        return text(' ');
+    }
+    function listen(node, event, handler, options) {
+        node.addEventListener(event, handler, options);
+        return () => node.removeEventListener(event, handler, options);
+    }
+    function attr(node, attribute, value) {
+        if (value == null)
+            node.removeAttribute(attribute);
+        else if (node.getAttribute(attribute) !== value)
+            node.setAttribute(attribute, value);
+    }
+    function children(element) {
+        return Array.from(element.childNodes);
+    }
+    function toggle_class(element, name, toggle) {
+        element.classList[toggle ? 'add' : 'remove'](name);
+    }
+    function custom_event(type, detail, { bubbles = false, cancelable = false } = {}) {
+        const e = document.createEvent('CustomEvent');
+        e.initCustomEvent(type, bubbles, cancelable, detail);
+        return e;
+    }
+
+    let current_component;
+    function set_current_component(component) {
+        current_component = component;
+    }
+    function get_current_component() {
+        if (!current_component)
+            throw new Error('Function called outside component initialization');
+        return current_component;
+    }
+    /**
+     * The `onMount` function schedules a callback to run as soon as the component has been mounted to the DOM.
+     * It must be called during the component's initialisation (but doesn't need to live *inside* the component;
+     * it can be called from an external module).
+     *
+     * `onMount` does not run inside a [server-side component](/docs#run-time-server-side-component-api).
+     *
+     * https://svelte.dev/docs#run-time-svelte-onmount
+     */
+    function onMount(fn) {
+        get_current_component().$$.on_mount.push(fn);
+    }
+    /**
+     * Creates an event dispatcher that can be used to dispatch [component events](/docs#template-syntax-component-directives-on-eventname).
+     * Event dispatchers are functions that can take two arguments: `name` and `detail`.
+     *
+     * Component events created with `createEventDispatcher` create a
+     * [CustomEvent](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent).
+     * These events do not [bubble](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#Event_bubbling_and_capture).
+     * The `detail` argument corresponds to the [CustomEvent.detail](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/detail)
+     * property and can contain any type of data.
+     *
+     * https://svelte.dev/docs#run-time-svelte-createeventdispatcher
+     */
+    function createEventDispatcher() {
+        const component = get_current_component();
+        return (type, detail, { cancelable = false } = {}) => {
+            const callbacks = component.$$.callbacks[type];
+            if (callbacks) {
+                // TODO are there situations where events could be dispatched
+                // in a server (non-DOM) environment?
+                const event = custom_event(type, detail, { cancelable });
+                callbacks.slice().forEach(fn => {
+                    fn.call(component, event);
+                });
+                return !event.defaultPrevented;
+            }
+            return true;
+        };
+    }
+
+    const dirty_components = [];
+    const binding_callbacks = [];
+    let render_callbacks = [];
+    const flush_callbacks = [];
+    const resolved_promise = /* @__PURE__ */ Promise.resolve();
+    let update_scheduled = false;
+    function schedule_update() {
+        if (!update_scheduled) {
+            update_scheduled = true;
+            resolved_promise.then(flush);
+        }
+    }
+    function add_render_callback(fn) {
+        render_callbacks.push(fn);
+    }
+    // flush() calls callbacks in this order:
+    // 1. All beforeUpdate callbacks, in order: parents before children
+    // 2. All bind:this callbacks, in reverse order: children before parents.
+    // 3. All afterUpdate callbacks, in order: parents before children. EXCEPT
+    //    for afterUpdates called during the initial onMount, which are called in
+    //    reverse order: children before parents.
+    // Since callbacks might update component values, which could trigger another
+    // call to flush(), the following steps guard against this:
+    // 1. During beforeUpdate, any updated components will be added to the
+    //    dirty_components array and will cause a reentrant call to flush(). Because
+    //    the flush index is kept outside the function, the reentrant call will pick
+    //    up where the earlier call left off and go through all dirty components. The
+    //    current_component value is saved and restored so that the reentrant call will
+    //    not interfere with the "parent" flush() call.
+    // 2. bind:this callbacks cannot trigger new flush() calls.
+    // 3. During afterUpdate, any updated components will NOT have their afterUpdate
+    //    callback called a second time; the seen_callbacks set, outside the flush()
+    //    function, guarantees this behavior.
+    const seen_callbacks = new Set();
+    let flushidx = 0; // Do *not* move this inside the flush() function
+    function flush() {
+        // Do not reenter flush while dirty components are updated, as this can
+        // result in an infinite loop. Instead, let the inner flush handle it.
+        // Reentrancy is ok afterwards for bindings etc.
+        if (flushidx !== 0) {
+            return;
+        }
+        const saved_component = current_component;
+        do {
+            // first, call beforeUpdate functions
+            // and update components
+            try {
+                while (flushidx < dirty_components.length) {
+                    const component = dirty_components[flushidx];
+                    flushidx++;
+                    set_current_component(component);
+                    update(component.$$);
+                }
+            }
+            catch (e) {
+                // reset dirty state to not end up in a deadlocked state and then rethrow
+                dirty_components.length = 0;
+                flushidx = 0;
+                throw e;
+            }
+            set_current_component(null);
+            dirty_components.length = 0;
+            flushidx = 0;
+            while (binding_callbacks.length)
+                binding_callbacks.pop()();
+            // then, once components are updated, call
+            // afterUpdate functions. This may cause
+            // subsequent updates...
+            for (let i = 0; i < render_callbacks.length; i += 1) {
+                const callback = render_callbacks[i];
+                if (!seen_callbacks.has(callback)) {
+                    // ...so guard against infinite loops
+                    seen_callbacks.add(callback);
+                    callback();
+                }
+            }
+            render_callbacks.length = 0;
+        } while (dirty_components.length);
+        while (flush_callbacks.length) {
+            flush_callbacks.pop()();
+        }
+        update_scheduled = false;
+        seen_callbacks.clear();
+        set_current_component(saved_component);
+    }
+    function update($$) {
+        if ($$.fragment !== null) {
+            $$.update();
+            run_all($$.before_update);
+            const dirty = $$.dirty;
+            $$.dirty = [-1];
+            $$.fragment && $$.fragment.p($$.ctx, dirty);
+            $$.after_update.forEach(add_render_callback);
+        }
+    }
+    /**
+     * Useful for example to execute remaining `afterUpdate` callbacks before executing `destroy`.
+     */
+    function flush_render_callbacks(fns) {
+        const filtered = [];
+        const targets = [];
+        render_callbacks.forEach((c) => fns.indexOf(c) === -1 ? filtered.push(c) : targets.push(c));
+        targets.forEach((c) => c());
+        render_callbacks = filtered;
+    }
+    const outroing = new Set();
+    let outros;
+    function transition_in(block, local) {
+        if (block && block.i) {
+            outroing.delete(block);
+            block.i(local);
+        }
+    }
+    function transition_out(block, local, detach, callback) {
+        if (block && block.o) {
+            if (outroing.has(block))
+                return;
+            outroing.add(block);
+            outros.c.push(() => {
+                outroing.delete(block);
+                if (callback) {
+                    if (detach)
+                        block.d(1);
+                    callback();
+                }
+            });
+            block.o(local);
+        }
+        else if (callback) {
+            callback();
+        }
+    }
+    function create_component(block) {
+        block && block.c();
+    }
+    function mount_component(component, target, anchor, customElement) {
+        const { fragment, after_update } = component.$$;
+        fragment && fragment.m(target, anchor);
+        if (!customElement) {
+            // onMount happens before the initial afterUpdate
+            add_render_callback(() => {
+                const new_on_destroy = component.$$.on_mount.map(run).filter(is_function);
+                // if the component was destroyed immediately
+                // it will update the `$$.on_destroy` reference to `null`.
+                // the destructured on_destroy may still reference to the old array
+                if (component.$$.on_destroy) {
+                    component.$$.on_destroy.push(...new_on_destroy);
+                }
+                else {
+                    // Edge case - component was destroyed immediately,
+                    // most likely as a result of a binding initialising
+                    run_all(new_on_destroy);
+                }
+                component.$$.on_mount = [];
+            });
+        }
+        after_update.forEach(add_render_callback);
+    }
+    function destroy_component(component, detaching) {
+        const $$ = component.$$;
+        if ($$.fragment !== null) {
+            flush_render_callbacks($$.after_update);
+            run_all($$.on_destroy);
+            $$.fragment && $$.fragment.d(detaching);
+            // TODO null out other refs, including component.$$ (but need to
+            // preserve final state?)
+            $$.on_destroy = $$.fragment = null;
+            $$.ctx = [];
+        }
+    }
+    function make_dirty(component, i) {
+        if (component.$$.dirty[0] === -1) {
+            dirty_components.push(component);
+            schedule_update();
+            component.$$.dirty.fill(0);
+        }
+        component.$$.dirty[(i / 31) | 0] |= (1 << (i % 31));
+    }
+    function init(component, options, instance, create_fragment, not_equal, props, append_styles, dirty = [-1]) {
+        const parent_component = current_component;
+        set_current_component(component);
+        const $$ = component.$$ = {
+            fragment: null,
+            ctx: [],
+            // state
+            props,
+            update: noop,
+            not_equal,
+            bound: blank_object(),
+            // lifecycle
+            on_mount: [],
+            on_destroy: [],
+            on_disconnect: [],
+            before_update: [],
+            after_update: [],
+            context: new Map(options.context || (parent_component ? parent_component.$$.context : [])),
+            // everything else
+            callbacks: blank_object(),
+            dirty,
+            skip_bound: false,
+            root: options.target || parent_component.$$.root
+        };
+        append_styles && append_styles($$.root);
+        let ready = false;
+        $$.ctx = instance
+            ? instance(component, options.props || {}, (i, ret, ...rest) => {
+                const value = rest.length ? rest[0] : ret;
+                if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {
+                    if (!$$.skip_bound && $$.bound[i])
+                        $$.bound[i](value);
+                    if (ready)
+                        make_dirty(component, i);
+                }
+                return ret;
+            })
+            : [];
+        $$.update();
+        ready = true;
+        run_all($$.before_update);
+        // `false` as a special case of no DOM component
+        $$.fragment = create_fragment ? create_fragment($$.ctx) : false;
+        if (options.target) {
+            if (options.hydrate) {
+                const nodes = children(options.target);
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                $$.fragment && $$.fragment.l(nodes);
+                nodes.forEach(detach);
+            }
+            else {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                $$.fragment && $$.fragment.c();
+            }
+            if (options.intro)
+                transition_in(component.$$.fragment);
+            mount_component(component, options.target, options.anchor, options.customElement);
+            flush();
+        }
+        set_current_component(parent_component);
+    }
+    /**
+     * Base class for Svelte components. Used when dev=false.
+     */
+    class SvelteComponent {
+        $destroy() {
+            destroy_component(this, 1);
+            this.$destroy = noop;
+        }
+        $on(type, callback) {
+            if (!is_function(callback)) {
+                return noop;
+            }
+            const callbacks = (this.$$.callbacks[type] || (this.$$.callbacks[type] = []));
+            callbacks.push(callback);
+            return () => {
+                const index = callbacks.indexOf(callback);
+                if (index !== -1)
+                    callbacks.splice(index, 1);
+            };
+        }
+        $set($$props) {
+            if (this.$$set && !is_empty($$props)) {
+                this.$$.skip_bound = true;
+                this.$$set($$props);
+                this.$$.skip_bound = false;
+            }
+        }
+    }
+
+    function dispatch_dev(type, detail) {
+        document.dispatchEvent(custom_event(type, Object.assign({ version: '3.59.2' }, detail), { bubbles: true }));
+    }
+    function append_dev(target, node) {
+        dispatch_dev('SvelteDOMInsert', { target, node });
+        append(target, node);
+    }
+    function insert_dev(target, node, anchor) {
+        dispatch_dev('SvelteDOMInsert', { target, node, anchor });
+        insert(target, node, anchor);
+    }
+    function detach_dev(node) {
+        dispatch_dev('SvelteDOMRemove', { node });
+        detach(node);
+    }
+    function listen_dev(node, event, handler, options, has_prevent_default, has_stop_propagation, has_stop_immediate_propagation) {
+        const modifiers = options === true ? ['capture'] : options ? Array.from(Object.keys(options)) : [];
+        if (has_prevent_default)
+            modifiers.push('preventDefault');
+        if (has_stop_propagation)
+            modifiers.push('stopPropagation');
+        if (has_stop_immediate_propagation)
+            modifiers.push('stopImmediatePropagation');
+        dispatch_dev('SvelteDOMAddEventListener', { node, event, handler, modifiers });
+        const dispose = listen(node, event, handler, options);
+        return () => {
+            dispatch_dev('SvelteDOMRemoveEventListener', { node, event, handler, modifiers });
+            dispose();
+        };
+    }
+    function attr_dev(node, attribute, value) {
+        attr(node, attribute, value);
+        if (value == null)
+            dispatch_dev('SvelteDOMRemoveAttribute', { node, attribute });
+        else
+            dispatch_dev('SvelteDOMSetAttribute', { node, attribute, value });
+    }
+    function prop_dev(node, property, value) {
+        node[property] = value;
+        dispatch_dev('SvelteDOMSetProperty', { node, property, value });
+    }
+    function set_data_dev(text, data) {
+        data = '' + data;
+        if (text.data === data)
+            return;
+        dispatch_dev('SvelteDOMSetData', { node: text, data });
+        text.data = data;
+    }
+    function validate_slots(name, slot, keys) {
+        for (const slot_key of Object.keys(slot)) {
+            if (!~keys.indexOf(slot_key)) {
+                console.warn(`<${name}> received an unexpected slot "${slot_key}".`);
+            }
+        }
+    }
+    /**
+     * Base class for Svelte components with some minor dev-enhancements. Used when dev=true.
+     */
+    class SvelteComponentDev extends SvelteComponent {
+        constructor(options) {
+            if (!options || (!options.target && !options.$$inline)) {
+                throw new Error("'target' is a required option");
+            }
+            super();
+        }
+        $destroy() {
+            super.$destroy();
+            this.$destroy = () => {
+                console.warn('Component was already destroyed'); // eslint-disable-line no-console
+            };
+        }
+        $capture_state() { }
+        $inject_state() { }
+    }
+
+    let isLoadingLibrary = false;
+    /**
+     * The list of callbacks, one from each GooglePlacesAutocomplete instance that requested the library before the library
+     * had finished loading.
+     */
+    const callbacks = [];
+    function hasLoadedLibrary() {
+        return window.google && window.google.maps && window.google.maps.places;
+    }
+    /**
+     * Load the Google Places library and notify the calling code (if given a callback) once the library is ready.
+     *
+     * This supports three scenarios:
+     * 1. The library hasn't been loaded yet and isn't in the process of loading yet.
+     * 2. The library hasn't been loaded yet but is already in the process of loading.
+     * 3. The library has already been loaded.
+     *
+     * In scenarios 1 and 2, any callbacks that have been provided (which could be multiple, if multiple
+     * GooglePlacesAutocomplete instances are in use) will be called when the library finishes loading.
+     *
+     * In scenario 3, the callback will be called immediately.
+     *
+     * @param apiKey Your Google Places API Key
+     * @param callback A callback (if you want to be notified when the library is available for use)
+     */
+    function loadGooglePlacesLibrary(apiKey, callback) {
+        if (hasLoadedLibrary()) {
+            callback();
+            return;
+        }
+        callback && callbacks.push(callback);
+        if (isLoadingLibrary) {
+            return;
+        }
+        isLoadingLibrary = true;
+        const element = document.createElement('script');
+        element.async = true;
+        element.defer = true;
+        element.onload = onLibraryLoaded;
+        element.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places`;
+        element.type = 'text/javascript';
+        document.head.appendChild(element);
+    }
+    function onLibraryLoaded() {
+        isLoadingLibrary = false;
+        let callback;
+        while (callback = callbacks.pop()) {
+            callback();
+        }
+    }
+
+    /* src/location-input/googlePlace/GooglePlaceAutocomplete.svelte generated by Svelte v3.59.2 */
+    const file$2 = "src/location-input/googlePlace/GooglePlaceAutocomplete.svelte";
+
+    function create_fragment$2(ctx) {
+    	let input;
+    	let input_class_value;
+    	let mounted;
+    	let dispose;
+
+    	const block = {
+    		c: function create() {
+    			input = element("input");
+    			attr_dev(input, "class", input_class_value = /*$$props*/ ctx[7].class);
+    			attr_dev(input, "placeholder", /*placeholder*/ ctx[0]);
+    			input.value = /*value*/ ctx[1];
+    			input.required = /*required*/ ctx[2];
+    			attr_dev(input, "pattern", /*pattern*/ ctx[3]);
+    			toggle_class(input, "input", true);
+    			add_location(input, file$2, 93, 0, 3467);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, input, anchor);
+    			/*input_binding*/ ctx[11](input);
+
+    			if (!mounted) {
+    				dispose = [
+    					listen_dev(input, "change", /*onChange*/ ctx[5], false, false, false, false),
+    					listen_dev(input, "keydown", /*onKeyDown*/ ctx[6], false, false, false, false)
+    				];
+
+    				mounted = true;
+    			}
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*$$props*/ 128 && input_class_value !== (input_class_value = /*$$props*/ ctx[7].class)) {
+    				attr_dev(input, "class", input_class_value);
+    			}
+
+    			if (dirty & /*placeholder*/ 1) {
+    				attr_dev(input, "placeholder", /*placeholder*/ ctx[0]);
+    			}
+
+    			if (dirty & /*value*/ 2 && input.value !== /*value*/ ctx[1]) {
+    				prop_dev(input, "value", /*value*/ ctx[1]);
+    			}
+
+    			if (dirty & /*required*/ 4) {
+    				prop_dev(input, "required", /*required*/ ctx[2]);
+    			}
+
+    			if (dirty & /*pattern*/ 8) {
+    				attr_dev(input, "pattern", /*pattern*/ ctx[3]);
+    			}
+
+    			if (dirty & /*$$props*/ 128) {
+    				toggle_class(input, "input", true);
+    			}
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(input);
+    			/*input_binding*/ ctx[11](null);
+    			mounted = false;
+    			run_all(dispose);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$2.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$2($$self, $$props, $$invalidate) {
+    	let selectedLocationName;
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots('GooglePlaceAutocomplete', slots, []);
+    	let { apiKey } = $$props;
+    	let { options = undefined } = $$props;
+    	let { placeholder = undefined } = $$props;
+    	let { value = "" } = $$props;
+    	let { required = false } = $$props;
+    	let { pattern = "" } = $$props;
+    	let { onSelect } = $$props;
+    	const dispatch = createEventDispatcher();
+    	let inputField;
+
+    	onMount(() => {
+    		loadGooglePlacesLibrary(apiKey, () => {
+    			$$invalidate(8, options["types"] = ["street_address", "premise", "subpremise", "point_of_interest"], options);
+    			const autocomplete = new google.maps.places.Autocomplete(inputField, Object.assign({}, options));
+
+    			autocomplete.addListener("place_changed", () => {
+    				const place = autocomplete.getPlace();
+
+    				// There are circumstances where the place_changed event fires, but we
+    				// were NOT given location data. I only want to propagate the event if we
+    				// truly received location data from Google.
+    				// See the `Type something, no suggestions, hit Enter` test case.
+    				if (hasLocationData(place)) {
+    					onSelect(place);
+    					setSelectedLocation({ place, text: inputField.value });
+    				}
+    			});
+
+    			dispatch("ready");
+
+    			setTimeout(
+    				() => {
+    					inputField.setAttribute("autocomplete", "one-time-code");
+    				},
+    				2000
+    			);
+    		});
+    	});
+
+    	function emptyLocationField() {
+    		$$invalidate(4, inputField.value = "", inputField);
+    		onChange();
+    	}
+
+    	function hasLocationData(place) {
+    		const fieldsToLookFor = options && options.fields || ["geometry"];
+    		return place.hasOwnProperty(fieldsToLookFor[0]);
+    	}
+
+    	function onChange() {
+    		if (inputField.value === "") {
+    			setSelectedLocation(null);
+    		}
+    	}
+
+    	function onKeyDown(event) {
+    		const suggestionsAreVisible = document.getElementsByClassName("pac-item").length;
+
+    		if (event.key === "Enter" || event.key === "Tab") {
+    			if (suggestionsAreVisible) {
+    				const isSuggestionSelected = document.getElementsByClassName("pac-item-selected").length;
+
+    				if (!isSuggestionSelected) {
+    					selectFirstSuggestion();
+    				}
+    			} else if (doesNotMatchSelectedLocation(inputField.value)) {
+    				setTimeout(emptyLocationField, 10);
+    			}
+    		} else if (event.key === "Escape") {
+    			setTimeout(emptyLocationField, 10);
+    		}
+
+    		if (suggestionsAreVisible) {
+    			if (event.key === "Enter") {
+    				/* When suggestions are visible, don't let an 'Enter' submit a form (since
+     * the user is interacting with the list of suggestions at the time, not
+     * expecting their actions to affect the form as a whole). */
+    				event.preventDefault();
+    			}
+    		}
+    	}
+
+    	function selectFirstSuggestion() {
+    		// Simulate the 'down arrow' key in order to select the first suggestion:
+    		// https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+    		const simulatedEvent = new KeyboardEvent("keydown",
+    		{
+    				key: "ArrowDown",
+    				code: "ArrowDown",
+    				keyCode: 40
+    			});
+
+    		inputField.dispatchEvent(simulatedEvent);
+    	}
+
+    	function setSelectedLocation(data) {
+    		selectedLocationName = data && data.text || "";
+    		dispatch("place_changed", data);
+    	}
+
+    	function doesNotMatchSelectedLocation(value) {
+    		return selectedLocationName !== value;
+    	}
+
+    	$$self.$$.on_mount.push(function () {
+    		if (apiKey === undefined && !('apiKey' in $$props || $$self.$$.bound[$$self.$$.props['apiKey']])) {
+    			console.warn("<GooglePlaceAutocomplete> was created without expected prop 'apiKey'");
+    		}
+
+    		if (onSelect === undefined && !('onSelect' in $$props || $$self.$$.bound[$$self.$$.props['onSelect']])) {
+    			console.warn("<GooglePlaceAutocomplete> was created without expected prop 'onSelect'");
+    		}
+    	});
+
+    	function input_binding($$value) {
+    		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
+    			inputField = $$value;
+    			$$invalidate(4, inputField);
+    		});
+    	}
+
+    	$$self.$$set = $$new_props => {
+    		$$invalidate(7, $$props = assign(assign({}, $$props), exclude_internal_props($$new_props)));
+    		if ('apiKey' in $$new_props) $$invalidate(9, apiKey = $$new_props.apiKey);
+    		if ('options' in $$new_props) $$invalidate(8, options = $$new_props.options);
+    		if ('placeholder' in $$new_props) $$invalidate(0, placeholder = $$new_props.placeholder);
+    		if ('value' in $$new_props) $$invalidate(1, value = $$new_props.value);
+    		if ('required' in $$new_props) $$invalidate(2, required = $$new_props.required);
+    		if ('pattern' in $$new_props) $$invalidate(3, pattern = $$new_props.pattern);
+    		if ('onSelect' in $$new_props) $$invalidate(10, onSelect = $$new_props.onSelect);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		loadGooglePlacesLibrary,
+    		createEventDispatcher,
+    		onMount,
+    		apiKey,
+    		options,
+    		placeholder,
+    		value,
+    		required,
+    		pattern,
+    		onSelect,
+    		dispatch,
+    		inputField,
+    		emptyLocationField,
+    		hasLocationData,
+    		onChange,
+    		onKeyDown,
+    		selectFirstSuggestion,
+    		setSelectedLocation,
+    		doesNotMatchSelectedLocation,
+    		selectedLocationName
+    	});
+
+    	$$self.$inject_state = $$new_props => {
+    		$$invalidate(7, $$props = assign(assign({}, $$props), $$new_props));
+    		if ('apiKey' in $$props) $$invalidate(9, apiKey = $$new_props.apiKey);
+    		if ('options' in $$props) $$invalidate(8, options = $$new_props.options);
+    		if ('placeholder' in $$props) $$invalidate(0, placeholder = $$new_props.placeholder);
+    		if ('value' in $$props) $$invalidate(1, value = $$new_props.value);
+    		if ('required' in $$props) $$invalidate(2, required = $$new_props.required);
+    		if ('pattern' in $$props) $$invalidate(3, pattern = $$new_props.pattern);
+    		if ('onSelect' in $$props) $$invalidate(10, onSelect = $$new_props.onSelect);
+    		if ('inputField' in $$props) $$invalidate(4, inputField = $$new_props.inputField);
+    		if ('selectedLocationName' in $$props) selectedLocationName = $$new_props.selectedLocationName;
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*value*/ 2) {
+    			selectedLocationName = value || "";
+    		}
+    	};
+
+    	$$props = exclude_internal_props($$props);
+
+    	return [
+    		placeholder,
+    		value,
+    		required,
+    		pattern,
+    		inputField,
+    		onChange,
+    		onKeyDown,
+    		$$props,
+    		options,
+    		apiKey,
+    		onSelect,
+    		input_binding
+    	];
+    }
+
+    class GooglePlaceAutocomplete extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(this, options, instance$2, create_fragment$2, safe_not_equal, {
+    			apiKey: 9,
+    			options: 8,
+    			placeholder: 0,
+    			value: 1,
+    			required: 2,
+    			pattern: 3,
+    			onSelect: 10
+    		});
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "GooglePlaceAutocomplete",
+    			options,
+    			id: create_fragment$2.name
+    		});
+    	}
+
+    	get apiKey() {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set apiKey(value) {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get options() {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set options(value) {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get placeholder() {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set placeholder(value) {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get value() {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set value(value) {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get required() {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set required(value) {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get pattern() {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set pattern(value) {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get onSelect() {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set onSelect(value) {
+    		throw new Error("<GooglePlaceAutocomplete>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    const parsePlaceResult = (place) => {
+        console.log(place);
+        const addressComponentsByType = (place.address_components || []).reduce(function (acc, data) {
+            data.types.forEach(function (type) {
+                acc[type] = data;
+            });
+            return acc;
+        }, {});
+        const placeGet = (key, short = false) => {
+            if (!(key in addressComponentsByType))
+                return null;
+            return short
+                ? addressComponentsByType[key].short_name
+                : addressComponentsByType[key].long_name;
+        };
+        const result = {
+            title: place.name,
+            formattedAddress: place.formatted_address,
+            externalId: place.place_id,
+            externalUrl: place.url,
+            houseNumber: placeGet("street_number"),
+            street: placeGet("route"),
+            street_2: [placeGet("floor"), placeGet("subpremise")]
+                .filter((item) => !!item)
+                .join(",") || null,
+            city: placeGet("locality") ||
+                placeGet("sublocality") ||
+                placeGet("sublocality_level_1") ||
+                placeGet("neighborhood") ||
+                placeGet("administrative_area_level_3") ||
+                placeGet("administrative_area_level_2"),
+            county: placeGet("administrative_area_level_2"),
+            stateShort: placeGet("administrative_area_level_1", true),
+            stateLong: placeGet("administrative_area_level_1"),
+            countryCode: placeGet("country", true),
+            countryLong: placeGet("country"),
+            postalCode: placeGet("postal_code"),
+        };
+        return result;
+    };
+
+    const displayNone = (el) => {
+        el.style.display = "none";
+    };
+    const displayBlock = (el, display = "block") => {
+        el.style.display = display;
+    };
+    function fadeIn(element, display = "block") {
+        let op = 0.1; // initial opacity
+        element.style.opacity = "0";
+        element.style.display = display;
+        const timer = setInterval(function () {
+            if (op >= 1) {
+                clearInterval(timer);
+            }
+            element.style.opacity = `${op}`;
+            element.style.filter = "alpha(opacity=" + op * 100 + ")";
+            op += op * 0.3;
+        }, 1);
+    }
+    function fadeOut(element) {
+        let op = 1; // initial opacity
+        const timer = setInterval(function () {
+            if (op <= 0.1) {
+                clearInterval(timer);
+                element.style.display = "none";
+            }
+            element.style.opacity = `${op}`;
+            element.style.filter = "alpha(opacity=" + op * 100 + ")";
+            op -= op * 0.3;
+        }, 1);
+    }
+
+    // exchanging data with initialized HS form is hard, creating some window vars here
+    const createWindowState = (key) => ({
+        update: (data) => {
+            try {
+                window[key] = Object.assign(Object.assign({}, window[key]), data);
+            }
+            catch (e) { }
+        },
+        get: () => {
+            try {
+                return window[key];
+            }
+            catch (_a) {
+                return {};
+            }
+        },
+    });
+    const addressState = createWindowState("addressState");
+    const windowVars = {
+        hubspotAddressData: null,
+    };
+
+    function fade(node, { delay = 0, duration = 400, easing = identity } = {}) {
+        const o = +getComputedStyle(node).opacity;
+        return {
+            delay,
+            duration,
+            easing,
+            css: t => `opacity: ${t * o}`
+        };
+    }
+
+    /* src/location-input/LocationInput.svelte generated by Svelte v3.59.2 */
+    const file$1 = "src/location-input/LocationInput.svelte";
+
+    // (137:2) {#if inputErrorMessage}
+    function create_if_block(ctx) {
+    	let p;
+    	let t;
+
+    	const block = {
+    		c: function create() {
+    			p = element("p");
+    			t = text(/*inputErrorMessage*/ ctx[4]);
+    			attr_dev(p, "class", "preorder-address-error-message");
+    			add_location(p, file$1, 137, 4, 4535);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, p, anchor);
+    			append_dev(p, t);
+    		},
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*inputErrorMessage*/ 16) set_data_dev(t, /*inputErrorMessage*/ ctx[4]);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(p);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block.name,
+    		type: "if",
+    		source: "(137:2) {#if inputErrorMessage}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$1(ctx) {
+    	let div1;
+    	let div0;
+    	let img;
+    	let img_src_value;
+    	let t0;
+    	let googleplaceautocomplete;
+    	let t1;
+    	let button;
+    	let t2;
+    	let t3;
+    	let t4;
+    	let div2;
+    	let current;
+
+    	googleplaceautocomplete = new GooglePlaceAutocomplete({
+    			props: {
+    				class: "location-search-input",
+    				apiKey: /*googlePublicApiKey*/ ctx[0],
+    				placeholder: "Enter your home address",
+    				onSelect: /*func*/ ctx[16],
+    				options: { componentRestrictions: { country: "us" } }
+    			},
+    			$$inline: true
+    		});
+
+    	let if_block = /*inputErrorMessage*/ ctx[4] && create_if_block(ctx);
+
+    	const block = {
+    		c: function create() {
+    			div1 = element("div");
+    			div0 = element("div");
+    			img = element("img");
+    			t0 = space();
+    			create_component(googleplaceautocomplete.$$.fragment);
+    			t1 = space();
+    			button = element("button");
+    			t2 = text(/*addressCtaText*/ ctx[1]);
+    			t3 = space();
+    			if (if_block) if_block.c();
+    			t4 = space();
+    			div2 = element("div");
+    			if (!src_url_equal(img.src, img_src_value = "https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.1/public/Base_files/map-pin.svg")) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "Map pin icon");
+    			add_location(img, file$1, 111, 4, 3790);
+    			attr_dev(div0, "class", "input-address-container");
+    			add_location(div0, file$1, 110, 2, 3748);
+    			attr_dev(button, "class", "submitAddressButton button secondary w-button");
+    			add_location(button, file$1, 133, 2, 4409);
+    			attr_dev(div1, "class", "input-address-wrap");
+    			add_location(div1, file$1, 109, 0, 3713);
+    			attr_dev(div2, "class", "focus_overlay");
+    			add_location(div2, file$1, 142, 0, 4628);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div1, anchor);
+    			append_dev(div1, div0);
+    			append_dev(div0, img);
+    			append_dev(div0, t0);
+    			mount_component(googleplaceautocomplete, div0, null);
+    			append_dev(div1, t1);
+    			append_dev(div1, button);
+    			append_dev(button, t2);
+    			append_dev(div1, t3);
+    			if (if_block) if_block.m(div1, null);
+    			insert_dev(target, t4, anchor);
+    			insert_dev(target, div2, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, [dirty]) {
+    			const googleplaceautocomplete_changes = {};
+    			if (dirty & /*googlePublicApiKey*/ 1) googleplaceautocomplete_changes.apiKey = /*googlePublicApiKey*/ ctx[0];
+    			if (dirty & /*onAddressSelect, inputErrorMessage, selectedAddress*/ 28) googleplaceautocomplete_changes.onSelect = /*func*/ ctx[16];
+    			googleplaceautocomplete.$set(googleplaceautocomplete_changes);
+    			if (!current || dirty & /*addressCtaText*/ 2) set_data_dev(t2, /*addressCtaText*/ ctx[1]);
+
+    			if (/*inputErrorMessage*/ ctx[4]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+    				} else {
+    					if_block = create_if_block(ctx);
+    					if_block.c();
+    					if_block.m(div1, null);
+    				}
+    			} else if (if_block) {
+    				if_block.d(1);
+    				if_block = null;
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(googleplaceautocomplete.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(googleplaceautocomplete.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div1);
+    			destroy_component(googleplaceautocomplete);
+    			if (if_block) if_block.d();
+    			if (detaching) detach_dev(t4);
+    			if (detaching) detach_dev(div2);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$1.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$1($$self, $$props, $$invalidate) {
+    	let inputErrorMessage;
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots('LocationInput', slots, []);
+    	let { targetAvailableText } = $$props;
+    	let { targetDisplayAddress } = $$props;
+    	let { googlePublicApiKey } = $$props;
+    	let { addressCtaText = "See if my home qualifies" } = $$props;
+    	const dispatch = createEventDispatcher();
+    	let addressInput;
+    	let autocomplete;
+    	let isFocused = false;
+    	let isOverlayVisible = false;
+    	let isInputFocused = false;
+    	let isInputValid = false;
+    	let isSubmitting = false;
+    	let errorMessage = "";
+    	let selectedAddress = null;
+
+    	function handleInputFocus() {
+    		isInputFocused = true;
+    		isOverlayVisible = true;
+    	}
+
+    	function handleInputBlur() {
+    		isInputFocused = false;
+
+    		setTimeout(
+    			() => {
+    				isOverlayVisible = false;
+    			},
+    			200
+    		);
+    	}
+
+    	function handleInputChange() {
+    		const value = addressInput.value.trim();
+    		isInputValid = value.length > 0;
+    		errorMessage = "";
+    	}
+
+    	function handleSubmit() {
+    		if (!selectedAddress) {
+    			errorMessage = "Please enter a full address.";
+    			return;
+    		}
+
+    		if (!selectedAddress.postalCode || !selectedAddress.houseNumber || !selectedAddress.street) {
+    			errorMessage = "Please enter a full address.";
+    			return;
+    		}
+
+    		if (!hidePanelEl) {
+    			fadeIn(panelEl);
+    		}
+
+    		displayBlock(stateContainerEl);
+    		displayNone(addressPanelEl);
+    		const targetDisplayAddressEl = document.querySelector(targetDisplayAddress);
+    		targetDisplayAddressEl.innerHTML = selectedAddress.formattedAddress;
+    		displayBlock(targetAvailableStateEl);
+    		displayNone(targetNotAvailableStateEl);
+    		addressState.update({ selectedAddress });
+
+    		onAddressSubmitSuccess === null || onAddressSubmitSuccess === void 0
+    		? void 0
+    		: onAddressSubmitSuccess(selectedAddress);
+    	}
+
+    	function handlePlaceSelect() {
+    		const place = autocomplete.getPlace();
+
+    		if (place) {
+    			$$invalidate(3, selectedAddress = parsePlaceResult(place));
+    			onAddressSelect(selectedAddress);
+    			isInputValid = true;
+    			errorMessage = "";
+    		}
+    	}
+
+    	onMount(() => {
+    		jQuery(".input-address-container").on("click", function () {
+    			jQuery(".focus_overlay").show();
+    			jQuery(".input-address-container").addClass("focused");
+    			jQuery("input.location-search-input").attr("placeholder", "Enter your home address");
+    			jQuery("button.submitAddressButton").hide();
+    		});
+
+    		jQuery(".input-address-container").on("keydown", function () {
+    			jQuery("input.location-search-input").attr("placeholder", "");
+    		});
+
+    		jQuery(".focus_overlay").on("click", function () {
+    			jQuery(".focus_overlay").hide();
+    			jQuery(".submitAddressButton").show();
+    			jQuery(".input-address-container").removeClass("focused");
+    		});
+    	});
+
+    	let { panelEl } = $$props;
+    	let { stateContainerEl } = $$props;
+    	let { addressPanelEl } = $$props;
+    	let { targetAvailableStateEl } = $$props;
+    	let { targetNotAvailableStateEl } = $$props;
+    	let { onAddressSelect } = $$props;
+    	let { onAddressSubmitSuccess } = $$props;
+    	let { hidePanelEl = false } = $$props;
+
+    	$$self.$$.on_mount.push(function () {
+    		if (targetAvailableText === undefined && !('targetAvailableText' in $$props || $$self.$$.bound[$$self.$$.props['targetAvailableText']])) {
+    			console.warn("<LocationInput> was created without expected prop 'targetAvailableText'");
+    		}
+
+    		if (targetDisplayAddress === undefined && !('targetDisplayAddress' in $$props || $$self.$$.bound[$$self.$$.props['targetDisplayAddress']])) {
+    			console.warn("<LocationInput> was created without expected prop 'targetDisplayAddress'");
+    		}
+
+    		if (googlePublicApiKey === undefined && !('googlePublicApiKey' in $$props || $$self.$$.bound[$$self.$$.props['googlePublicApiKey']])) {
+    			console.warn("<LocationInput> was created without expected prop 'googlePublicApiKey'");
+    		}
+
+    		if (panelEl === undefined && !('panelEl' in $$props || $$self.$$.bound[$$self.$$.props['panelEl']])) {
+    			console.warn("<LocationInput> was created without expected prop 'panelEl'");
+    		}
+
+    		if (stateContainerEl === undefined && !('stateContainerEl' in $$props || $$self.$$.bound[$$self.$$.props['stateContainerEl']])) {
+    			console.warn("<LocationInput> was created without expected prop 'stateContainerEl'");
+    		}
+
+    		if (addressPanelEl === undefined && !('addressPanelEl' in $$props || $$self.$$.bound[$$self.$$.props['addressPanelEl']])) {
+    			console.warn("<LocationInput> was created without expected prop 'addressPanelEl'");
+    		}
+
+    		if (targetAvailableStateEl === undefined && !('targetAvailableStateEl' in $$props || $$self.$$.bound[$$self.$$.props['targetAvailableStateEl']])) {
+    			console.warn("<LocationInput> was created without expected prop 'targetAvailableStateEl'");
+    		}
+
+    		if (targetNotAvailableStateEl === undefined && !('targetNotAvailableStateEl' in $$props || $$self.$$.bound[$$self.$$.props['targetNotAvailableStateEl']])) {
+    			console.warn("<LocationInput> was created without expected prop 'targetNotAvailableStateEl'");
+    		}
+
+    		if (onAddressSelect === undefined && !('onAddressSelect' in $$props || $$self.$$.bound[$$self.$$.props['onAddressSelect']])) {
+    			console.warn("<LocationInput> was created without expected prop 'onAddressSelect'");
+    		}
+
+    		if (onAddressSubmitSuccess === undefined && !('onAddressSubmitSuccess' in $$props || $$self.$$.bound[$$self.$$.props['onAddressSubmitSuccess']])) {
+    			console.warn("<LocationInput> was created without expected prop 'onAddressSubmitSuccess'");
+    		}
+    	});
+
+    	const writable_props = [
+    		'targetAvailableText',
+    		'targetDisplayAddress',
+    		'googlePublicApiKey',
+    		'addressCtaText',
+    		'panelEl',
+    		'stateContainerEl',
+    		'addressPanelEl',
+    		'targetAvailableStateEl',
+    		'targetNotAvailableStateEl',
+    		'onAddressSelect',
+    		'onAddressSubmitSuccess',
+    		'hidePanelEl'
+    	];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<LocationInput> was created with unknown prop '${key}'`);
+    	});
+
+    	const func = value => {
+    		const parsed = parsePlaceResult(value);
+    		onAddressSelect?.(parsed);
+    		window.blur();
+    		$$invalidate(4, inputErrorMessage = "");
+    		$$invalidate(3, selectedAddress = parsed);
+    		handleSubmit();
+    	};
+
+    	$$self.$$set = $$props => {
+    		if ('targetAvailableText' in $$props) $$invalidate(6, targetAvailableText = $$props.targetAvailableText);
+    		if ('targetDisplayAddress' in $$props) $$invalidate(7, targetDisplayAddress = $$props.targetDisplayAddress);
+    		if ('googlePublicApiKey' in $$props) $$invalidate(0, googlePublicApiKey = $$props.googlePublicApiKey);
+    		if ('addressCtaText' in $$props) $$invalidate(1, addressCtaText = $$props.addressCtaText);
+    		if ('panelEl' in $$props) $$invalidate(8, panelEl = $$props.panelEl);
+    		if ('stateContainerEl' in $$props) $$invalidate(9, stateContainerEl = $$props.stateContainerEl);
+    		if ('addressPanelEl' in $$props) $$invalidate(10, addressPanelEl = $$props.addressPanelEl);
+    		if ('targetAvailableStateEl' in $$props) $$invalidate(11, targetAvailableStateEl = $$props.targetAvailableStateEl);
+    		if ('targetNotAvailableStateEl' in $$props) $$invalidate(12, targetNotAvailableStateEl = $$props.targetNotAvailableStateEl);
+    		if ('onAddressSelect' in $$props) $$invalidate(2, onAddressSelect = $$props.onAddressSelect);
+    		if ('onAddressSubmitSuccess' in $$props) $$invalidate(13, onAddressSubmitSuccess = $$props.onAddressSubmitSuccess);
+    		if ('hidePanelEl' in $$props) $$invalidate(14, hidePanelEl = $$props.hidePanelEl);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		GooglePlaceAutocomplete,
+    		parsePlaceResult,
+    		displayBlock,
+    		displayNone,
+    		fadeIn,
+    		onMount,
+    		addressState,
+    		createEventDispatcher,
+    		fade,
+    		fadeOut,
+    		windowVars,
+    		targetAvailableText,
+    		targetDisplayAddress,
+    		googlePublicApiKey,
+    		addressCtaText,
+    		dispatch,
+    		addressInput,
+    		autocomplete,
+    		isFocused,
+    		isOverlayVisible,
+    		isInputFocused,
+    		isInputValid,
+    		isSubmitting,
+    		errorMessage,
+    		selectedAddress,
+    		handleInputFocus,
+    		handleInputBlur,
+    		handleInputChange,
+    		handleSubmit,
+    		handlePlaceSelect,
+    		panelEl,
+    		stateContainerEl,
+    		addressPanelEl,
+    		targetAvailableStateEl,
+    		targetNotAvailableStateEl,
+    		onAddressSelect,
+    		onAddressSubmitSuccess,
+    		hidePanelEl,
+    		inputErrorMessage
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ('targetAvailableText' in $$props) $$invalidate(6, targetAvailableText = $$props.targetAvailableText);
+    		if ('targetDisplayAddress' in $$props) $$invalidate(7, targetDisplayAddress = $$props.targetDisplayAddress);
+    		if ('googlePublicApiKey' in $$props) $$invalidate(0, googlePublicApiKey = $$props.googlePublicApiKey);
+    		if ('addressCtaText' in $$props) $$invalidate(1, addressCtaText = $$props.addressCtaText);
+    		if ('addressInput' in $$props) $$invalidate(22, addressInput = $$props.addressInput);
+    		if ('autocomplete' in $$props) $$invalidate(15, autocomplete = $$props.autocomplete);
+    		if ('isFocused' in $$props) isFocused = $$props.isFocused;
+    		if ('isOverlayVisible' in $$props) isOverlayVisible = $$props.isOverlayVisible;
+    		if ('isInputFocused' in $$props) isInputFocused = $$props.isInputFocused;
+    		if ('isInputValid' in $$props) isInputValid = $$props.isInputValid;
+    		if ('isSubmitting' in $$props) isSubmitting = $$props.isSubmitting;
+    		if ('errorMessage' in $$props) errorMessage = $$props.errorMessage;
+    		if ('selectedAddress' in $$props) $$invalidate(3, selectedAddress = $$props.selectedAddress);
+    		if ('panelEl' in $$props) $$invalidate(8, panelEl = $$props.panelEl);
+    		if ('stateContainerEl' in $$props) $$invalidate(9, stateContainerEl = $$props.stateContainerEl);
+    		if ('addressPanelEl' in $$props) $$invalidate(10, addressPanelEl = $$props.addressPanelEl);
+    		if ('targetAvailableStateEl' in $$props) $$invalidate(11, targetAvailableStateEl = $$props.targetAvailableStateEl);
+    		if ('targetNotAvailableStateEl' in $$props) $$invalidate(12, targetNotAvailableStateEl = $$props.targetNotAvailableStateEl);
+    		if ('onAddressSelect' in $$props) $$invalidate(2, onAddressSelect = $$props.onAddressSelect);
+    		if ('onAddressSubmitSuccess' in $$props) $$invalidate(13, onAddressSubmitSuccess = $$props.onAddressSubmitSuccess);
+    		if ('hidePanelEl' in $$props) $$invalidate(14, hidePanelEl = $$props.hidePanelEl);
+    		if ('inputErrorMessage' in $$props) $$invalidate(4, inputErrorMessage = $$props.inputErrorMessage);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*googlePublicApiKey, autocomplete*/ 32769) {
+    			if (addressInput && googlePublicApiKey) {
+    				$$invalidate(15, autocomplete = new google.maps.places.Autocomplete(addressInput,
+    				{
+    						types: ["address"],
+    						componentRestrictions: { country: "us" }
+    					}));
+
+    				autocomplete.addListener("place_changed", handlePlaceSelect);
+    			}
+    		}
+    	};
+
+    	$$invalidate(4, inputErrorMessage = "");
+    	$$invalidate(3, selectedAddress = null);
+
+    	return [
+    		googlePublicApiKey,
+    		addressCtaText,
+    		onAddressSelect,
+    		selectedAddress,
+    		inputErrorMessage,
+    		handleSubmit,
+    		targetAvailableText,
+    		targetDisplayAddress,
+    		panelEl,
+    		stateContainerEl,
+    		addressPanelEl,
+    		targetAvailableStateEl,
+    		targetNotAvailableStateEl,
+    		onAddressSubmitSuccess,
+    		hidePanelEl,
+    		autocomplete,
+    		func
+    	];
+    }
+
+    class LocationInput extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(this, options, instance$1, create_fragment$1, safe_not_equal, {
+    			targetAvailableText: 6,
+    			targetDisplayAddress: 7,
+    			googlePublicApiKey: 0,
+    			addressCtaText: 1,
+    			panelEl: 8,
+    			stateContainerEl: 9,
+    			addressPanelEl: 10,
+    			targetAvailableStateEl: 11,
+    			targetNotAvailableStateEl: 12,
+    			onAddressSelect: 2,
+    			onAddressSubmitSuccess: 13,
+    			hidePanelEl: 14
+    		});
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "LocationInput",
+    			options,
+    			id: create_fragment$1.name
+    		});
+    	}
+
+    	get targetAvailableText() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set targetAvailableText(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get targetDisplayAddress() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set targetDisplayAddress(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get googlePublicApiKey() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set googlePublicApiKey(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get addressCtaText() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set addressCtaText(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get panelEl() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set panelEl(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get stateContainerEl() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set stateContainerEl(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get addressPanelEl() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set addressPanelEl(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get targetAvailableStateEl() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set targetAvailableStateEl(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get targetNotAvailableStateEl() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set targetNotAvailableStateEl(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get onAddressSelect() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set onAddressSelect(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get onAddressSubmitSuccess() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set onAddressSubmitSuccess(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get hidePanelEl() {
+    		throw new Error("<LocationInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set hidePanelEl(value) {
+    		throw new Error("<LocationInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* src/location-input/ZipCodeInput.svelte generated by Svelte v3.59.2 */
+    const file = "src/location-input/ZipCodeInput.svelte";
+
+    function create_fragment(ctx) {
+    	let div8;
+    	let div7;
+    	let div6;
+    	let input;
+    	let t0;
+    	let div5;
+    	let div0;
+    	let t1_value = (/*zipCode*/ ctx[1][0] || '') + "";
+    	let t1;
+    	let t2;
+    	let div1;
+    	let t3_value = (/*zipCode*/ ctx[1][1] || '') + "";
+    	let t3;
+    	let t4;
+    	let div2;
+    	let t5_value = (/*zipCode*/ ctx[1][2] || '') + "";
+    	let t5;
+    	let t6;
+    	let div3;
+    	let t7_value = (/*zipCode*/ ctx[1][3] || '') + "";
+    	let t7;
+    	let t8;
+    	let div4;
+    	let t9_value = (/*zipCode*/ ctx[1][4] || '') + "";
+    	let t9;
+    	let t10;
+    	let button;
+
+    	let t11_value = (/*isComplete*/ ctx[2]
+    	? /*addressCtaText*/ ctx[0]
+    	: "Enter your zip code") + "";
+
+    	let t11;
+    	let button_disabled_value;
+    	let t12;
+    	let div9;
+    	let mounted;
+    	let dispose;
+
+    	const block = {
+    		c: function create() {
+    			div8 = element("div");
+    			div7 = element("div");
+    			div6 = element("div");
+    			input = element("input");
+    			t0 = space();
+    			div5 = element("div");
+    			div0 = element("div");
+    			t1 = text(t1_value);
+    			t2 = space();
+    			div1 = element("div");
+    			t3 = text(t3_value);
+    			t4 = space();
+    			div2 = element("div");
+    			t5 = text(t5_value);
+    			t6 = space();
+    			div3 = element("div");
+    			t7 = text(t7_value);
+    			t8 = space();
+    			div4 = element("div");
+    			t9 = text(t9_value);
+    			t10 = space();
+    			button = element("button");
+    			t11 = text(t11_value);
+    			t12 = space();
+    			div9 = element("div");
+    			attr_dev(input, "type", "text");
+    			attr_dev(input, "inputmode", "numeric");
+    			attr_dev(input, "pattern", "[0-9]*");
+    			attr_dev(input, "class", "zip-search-input");
+    			attr_dev(input, "maxlength", "5");
+    			add_location(input, file, 93, 6, 3101);
+    			attr_dev(div0, "class", "zip-box");
+    			toggle_class(div0, "filled", /*zipCode*/ ctx[1].length >= 1);
+    			add_location(div0, file, 103, 8, 3392);
+    			attr_dev(div1, "class", "zip-box");
+    			toggle_class(div1, "filled", /*zipCode*/ ctx[1].length >= 2);
+    			add_location(div1, file, 104, 8, 3481);
+    			attr_dev(div2, "class", "zip-box");
+    			toggle_class(div2, "filled", /*zipCode*/ ctx[1].length >= 3);
+    			add_location(div2, file, 105, 8, 3570);
+    			attr_dev(div3, "class", "zip-box");
+    			toggle_class(div3, "filled", /*zipCode*/ ctx[1].length >= 4);
+    			add_location(div3, file, 106, 8, 3659);
+    			attr_dev(div4, "class", "zip-box");
+    			toggle_class(div4, "filled", /*zipCode*/ ctx[1].length >= 5);
+    			add_location(div4, file, 107, 8, 3748);
+    			attr_dev(div5, "class", "zip-boxes");
+    			add_location(div5, file, 102, 6, 3360);
+    			attr_dev(div6, "class", "zip-input-layout");
+    			add_location(div6, file, 92, 4, 3064);
+    			attr_dev(button, "class", "submitZipButton button secondary w-button");
+    			button.disabled = button_disabled_value = !/*isComplete*/ ctx[2];
+    			add_location(button, file, 110, 4, 3857);
+    			attr_dev(div7, "class", "input-zip-container");
+    			add_location(div7, file, 91, 2, 3026);
+    			attr_dev(div8, "class", "input-zip-wrap");
+    			add_location(div8, file, 90, 0, 2995);
+    			attr_dev(div9, "class", "focus_overlay");
+    			add_location(div9, file, 119, 0, 4078);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div8, anchor);
+    			append_dev(div8, div7);
+    			append_dev(div7, div6);
+    			append_dev(div6, input);
+    			append_dev(div6, t0);
+    			append_dev(div6, div5);
+    			append_dev(div5, div0);
+    			append_dev(div0, t1);
+    			append_dev(div5, t2);
+    			append_dev(div5, div1);
+    			append_dev(div1, t3);
+    			append_dev(div5, t4);
+    			append_dev(div5, div2);
+    			append_dev(div2, t5);
+    			append_dev(div5, t6);
+    			append_dev(div5, div3);
+    			append_dev(div3, t7);
+    			append_dev(div5, t8);
+    			append_dev(div5, div4);
+    			append_dev(div4, t9);
+    			append_dev(div7, t10);
+    			append_dev(div7, button);
+    			append_dev(button, t11);
+    			insert_dev(target, t12, anchor);
+    			insert_dev(target, div9, anchor);
+
+    			if (!mounted) {
+    				dispose = [
+    					listen_dev(input, "input", /*handleInput*/ ctx[3], false, false, false, false),
+    					listen_dev(input, "keydown", /*keydown_handler*/ ctx[10], false, false, false, false),
+    					listen_dev(button, "click", /*handleSubmit*/ ctx[4], false, false, false, false)
+    				];
+
+    				mounted = true;
+    			}
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*zipCode*/ 2 && t1_value !== (t1_value = (/*zipCode*/ ctx[1][0] || '') + "")) set_data_dev(t1, t1_value);
+
+    			if (dirty & /*zipCode*/ 2) {
+    				toggle_class(div0, "filled", /*zipCode*/ ctx[1].length >= 1);
+    			}
+
+    			if (dirty & /*zipCode*/ 2 && t3_value !== (t3_value = (/*zipCode*/ ctx[1][1] || '') + "")) set_data_dev(t3, t3_value);
+
+    			if (dirty & /*zipCode*/ 2) {
+    				toggle_class(div1, "filled", /*zipCode*/ ctx[1].length >= 2);
+    			}
+
+    			if (dirty & /*zipCode*/ 2 && t5_value !== (t5_value = (/*zipCode*/ ctx[1][2] || '') + "")) set_data_dev(t5, t5_value);
+
+    			if (dirty & /*zipCode*/ 2) {
+    				toggle_class(div2, "filled", /*zipCode*/ ctx[1].length >= 3);
+    			}
+
+    			if (dirty & /*zipCode*/ 2 && t7_value !== (t7_value = (/*zipCode*/ ctx[1][3] || '') + "")) set_data_dev(t7, t7_value);
+
+    			if (dirty & /*zipCode*/ 2) {
+    				toggle_class(div3, "filled", /*zipCode*/ ctx[1].length >= 4);
+    			}
+
+    			if (dirty & /*zipCode*/ 2 && t9_value !== (t9_value = (/*zipCode*/ ctx[1][4] || '') + "")) set_data_dev(t9, t9_value);
+
+    			if (dirty & /*zipCode*/ 2) {
+    				toggle_class(div4, "filled", /*zipCode*/ ctx[1].length >= 5);
+    			}
+
+    			if (dirty & /*isComplete, addressCtaText*/ 5 && t11_value !== (t11_value = (/*isComplete*/ ctx[2]
+    			? /*addressCtaText*/ ctx[0]
+    			: "Enter your zip code") + "")) set_data_dev(t11, t11_value);
+
+    			if (dirty & /*isComplete*/ 4 && button_disabled_value !== (button_disabled_value = !/*isComplete*/ ctx[2])) {
+    				prop_dev(button, "disabled", button_disabled_value);
+    			}
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div8);
+    			if (detaching) detach_dev(t12);
+    			if (detaching) detach_dev(div9);
+    			mounted = false;
+    			run_all(dispose);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance($$self, $$props, $$invalidate) {
+    	let inputErrorMessage;
+    	let isComplete;
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots('ZipCodeInput', slots, []);
+    	let { addressCtaText = "See if I qualify" } = $$props;
+
+    	let { onAddressSubmitSuccess = () => {
+    		
+    	} } = $$props;
+
+    	let { panelEl = null } = $$props;
+    	let { stateContainerEl = null } = $$props;
+    	let { addressPanelEl = null } = $$props;
+    	let { hidePanelEl = false } = $$props;
+
+    	onMount(() => {
+    		const inputContainer = document.querySelector(".input-zip-container");
+    		const focusOverlay = document.querySelector(".focus_overlay");
+    		const input = document.querySelector(".zip-search-input");
+
+    		if (inputContainer && focusOverlay) {
+    			inputContainer.addEventListener("click", () => {
+    				if (zipCode.length !== 5) {
+    					// Only show overlay if not complete
+    					focusOverlay.style.display = "block";
+
+    					inputContainer.classList.add("focused");
+    				}
+
+    				input === null || input === void 0
+    				? void 0
+    				: input.focus();
+    			});
+
+    			focusOverlay.addEventListener("click", () => {
+    				focusOverlay.style.display = "none";
+    				inputContainer.classList.remove("focused");
+    			});
+    		}
+    	});
+
+    	let zipCode = "";
+
+    	const handleInput = event => {
+    		const input = event.target;
+
+    		// Only allow numbers
+    		const value = input.value.replace(/\D/g, '');
+
+    		// Limit to 5 digits
+    		if (value.length > 5) {
+    			input.value = value.slice(0, 5);
+    		} else {
+    			input.value = value;
+    		}
+
+    		$$invalidate(1, zipCode = input.value);
+    	};
+
+    	const handleSubmit = () => {
+    		if (!zipCode) {
+    			inputErrorMessage = "Please enter a zip code.";
+    			return;
+    		}
+
+    		if (zipCode.length !== 5) {
+    			inputErrorMessage = "Please enter a valid 5-digit zip code.";
+    			return;
+    		}
+
+    		// Only try to show panel if it exists and we're not hiding it
+    		if (panelEl && !hidePanelEl) {
+    			fadeIn(panelEl);
+    		}
+
+    		// Only try to show/hide state container if it exists
+    		if (stateContainerEl) {
+    			displayBlock(stateContainerEl);
+    		}
+
+    		// Only try to hide address panel if it exists
+    		if (addressPanelEl) {
+    			displayNone(addressPanelEl);
+    		}
+
+    		// Create a minimal address object for consistency with LocationInput
+    		const minimalAddress = {
+    			title: "",
+    			formattedAddress: zipCode,
+    			externalId: "",
+    			externalUrl: "",
+    			houseNumber: "",
+    			street: "",
+    			street_2: "",
+    			city: "",
+    			county: "",
+    			stateShort: "",
+    			stateLong: "",
+    			countryCode: "US",
+    			countryLong: "United States",
+    			postalCode: zipCode
+    		};
+
+    		// Always update state and call success handler
+    		addressState.update({
+    			selectedAddress: minimalAddress,
+    			zipConfig: null
+    		});
+
+    		onAddressSubmitSuccess === null || onAddressSubmitSuccess === void 0
+    		? void 0
+    		: onAddressSubmitSuccess(minimalAddress, "lead-preorder-form", null);
+    	};
+
+    	const writable_props = [
+    		'addressCtaText',
+    		'onAddressSubmitSuccess',
+    		'panelEl',
+    		'stateContainerEl',
+    		'addressPanelEl',
+    		'hidePanelEl'
+    	];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<ZipCodeInput> was created with unknown prop '${key}'`);
+    	});
+
+    	const keydown_handler = e => e.key === 'Enter' && isComplete && handleSubmit();
+
+    	$$self.$$set = $$props => {
+    		if ('addressCtaText' in $$props) $$invalidate(0, addressCtaText = $$props.addressCtaText);
+    		if ('onAddressSubmitSuccess' in $$props) $$invalidate(5, onAddressSubmitSuccess = $$props.onAddressSubmitSuccess);
+    		if ('panelEl' in $$props) $$invalidate(6, panelEl = $$props.panelEl);
+    		if ('stateContainerEl' in $$props) $$invalidate(7, stateContainerEl = $$props.stateContainerEl);
+    		if ('addressPanelEl' in $$props) $$invalidate(8, addressPanelEl = $$props.addressPanelEl);
+    		if ('hidePanelEl' in $$props) $$invalidate(9, hidePanelEl = $$props.hidePanelEl);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		onMount,
+    		displayBlock,
+    		displayNone,
+    		fadeIn,
+    		addressState,
+    		addressCtaText,
+    		onAddressSubmitSuccess,
+    		panelEl,
+    		stateContainerEl,
+    		addressPanelEl,
+    		hidePanelEl,
+    		zipCode,
+    		handleInput,
+    		handleSubmit,
+    		inputErrorMessage,
+    		isComplete
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ('addressCtaText' in $$props) $$invalidate(0, addressCtaText = $$props.addressCtaText);
+    		if ('onAddressSubmitSuccess' in $$props) $$invalidate(5, onAddressSubmitSuccess = $$props.onAddressSubmitSuccess);
+    		if ('panelEl' in $$props) $$invalidate(6, panelEl = $$props.panelEl);
+    		if ('stateContainerEl' in $$props) $$invalidate(7, stateContainerEl = $$props.stateContainerEl);
+    		if ('addressPanelEl' in $$props) $$invalidate(8, addressPanelEl = $$props.addressPanelEl);
+    		if ('hidePanelEl' in $$props) $$invalidate(9, hidePanelEl = $$props.hidePanelEl);
+    		if ('zipCode' in $$props) $$invalidate(1, zipCode = $$props.zipCode);
+    		if ('inputErrorMessage' in $$props) inputErrorMessage = $$props.inputErrorMessage;
+    		if ('isComplete' in $$props) $$invalidate(2, isComplete = $$props.isComplete);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*zipCode*/ 2) {
+    			$$invalidate(2, isComplete = zipCode.length === 5);
+    		}
+    	};
+
+    	inputErrorMessage = "";
+
+    	return [
+    		addressCtaText,
+    		zipCode,
+    		isComplete,
+    		handleInput,
+    		handleSubmit,
+    		onAddressSubmitSuccess,
+    		panelEl,
+    		stateContainerEl,
+    		addressPanelEl,
+    		hidePanelEl,
+    		keydown_handler
+    	];
+    }
+
+    class ZipCodeInput extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(this, options, instance, create_fragment, safe_not_equal, {
+    			addressCtaText: 0,
+    			onAddressSubmitSuccess: 5,
+    			panelEl: 6,
+    			stateContainerEl: 7,
+    			addressPanelEl: 8,
+    			hidePanelEl: 9
+    		});
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "ZipCodeInput",
+    			options,
+    			id: create_fragment.name
+    		});
+    	}
+
+    	get addressCtaText() {
+    		throw new Error("<ZipCodeInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set addressCtaText(value) {
+    		throw new Error("<ZipCodeInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get onAddressSubmitSuccess() {
+    		throw new Error("<ZipCodeInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set onAddressSubmitSuccess(value) {
+    		throw new Error("<ZipCodeInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get panelEl() {
+    		throw new Error("<ZipCodeInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set panelEl(value) {
+    		throw new Error("<ZipCodeInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get stateContainerEl() {
+    		throw new Error("<ZipCodeInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set stateContainerEl(value) {
+    		throw new Error("<ZipCodeInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get addressPanelEl() {
+    		throw new Error("<ZipCodeInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set addressPanelEl(value) {
+    		throw new Error("<ZipCodeInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get hidePanelEl() {
+    		throw new Error("<ZipCodeInput>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set hidePanelEl(value) {
+    		throw new Error("<ZipCodeInput>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    const PreorderApp = {
+        initialize: (props) => {
+            const { targetElAddressInput = document.getElementById("hero-address-entry"), googlePublicApiKey, targetPanel, targetAddressPanel, targetAvailableState, targetNotAvailableState, targetStateContainer, targetAvailableText, targetDisplayAddress, onAddressSelect, onAddressSubmitSuccess, hidePanelEl, addressCtaText, } = props;
+            const panelEl = document.querySelector(targetPanel);
+            const stateContainerEl = document.querySelector(targetStateContainer);
+            const addressPanelEl = document.querySelector(targetAddressPanel);
+            const targetAvailableStateEl = document.querySelector(targetAvailableState);
+            const targetNotAvailableStateEl = document.querySelector(targetNotAvailableState);
+            // Set up close button
+            document.querySelectorAll(".close-button").forEach((el) => {
+                el.addEventListener("click", () => {
+                    fadeOut(panelEl);
+                });
+            });
+            const locationInput = new LocationInput({
+                target: targetElAddressInput,
+                props: {
+                    googlePublicApiKey,
+                    targetAvailableText,
+                    targetDisplayAddress,
+                    addressPanelEl,
+                    targetAvailableStateEl,
+                    stateContainerEl,
+                    panelEl,
+                    targetNotAvailableStateEl,
+                    onAddressSelect,
+                    onAddressSubmitSuccess,
+                    hidePanelEl,
+                    addressCtaText: addressCtaText || "See if my home qualifies",
+                },
+            });
+            return locationInput;
+        },
+        initializeZipCode: (props) => {
+            const { targetElAddressInput = document.getElementById("zip-code-entry"), targetPanel, targetAddressPanel, targetStateContainer, onAddressSubmitSuccess, hidePanelEl, addressCtaText, } = props;
+            // Only initialize panel elements if they are provided
+            const panelEl = targetPanel ? document.querySelector(targetPanel) : null;
+            const stateContainerEl = targetStateContainer ? document.querySelector(targetStateContainer) : null;
+            const addressPanelEl = targetAddressPanel ? document.querySelector(targetAddressPanel) : null;
+            // Only set up close button if panelEl exists
+            if (panelEl) {
+                document.querySelectorAll(".close-button").forEach((el) => {
+                    el.addEventListener("click", () => {
+                        fadeOut(panelEl);
+                    });
+                });
+            }
+            const zipCodeInput = new ZipCodeInput({
+                target: targetElAddressInput,
+                props: {
+                    onAddressSubmitSuccess,
+                    addressCtaText: addressCtaText || "Check availability",
+                    panelEl,
+                    stateContainerEl,
+                    addressPanelEl,
+                    hidePanelEl,
+                },
+            });
+            return zipCodeInput;
+        },
+    };
+
+    window.BasePreorderApp = PreorderApp;
+    // Initialize ZIP code input when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize hero address input
+        if (document.getElementById("hero-address-entry")) {
+            PreorderApp.initialize({
+                targetElAddressInput: document.getElementById("hero-address-entry"),
+                googlePublicApiKey: "AIzaSyB0o_nPI-xjHYKg7KB0bl87Yhnf2ng9Nsg",
+                querySelectorClickToOpenForm: '[data-preorder="open"]',
+                addressCtaText: "Check availability",
+                onAddressSelect: () => {
+                    if (window.posthog) {
+                        window.posthog.capture("user-submit-address-form");
+                    }
+                },
+                onAddressSubmitSuccess: async (addressData) => {
+                    var _a, _b, _c, _d;
+                    if (window.gtag) {
+                        window.gtag("event", "address-submit", { addressData });
+                    }
+                    window.hubspotAddressData = addressData;
+                    let marketStatus = "unavailable";
+                    try {
+                        const response = await fetch("https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv");
+                        const csvText = await response.text();
+                        const lines = csvText.split("\n");
+                        lines.slice(1).some((line) => {
+                            var _a, _b, _c, _d, _e, _f;
+                            const columns = line.split(",");
+                            if (((_a = columns[1]) === null || _a === void 0 ? void 0 : _a.trim()) === ((_c = (_b = addressData === null || addressData === void 0 ? void 0 : addressData.postalCode) === null || _b === void 0 ? void 0 : _b.trim()) === null || _c === void 0 ? void 0 : _c.substring(0, 5))) {
+                                if (((_d = columns[4]) === null || _d === void 0 ? void 0 : _d.trim()) === "yes") {
+                                    marketStatus = "yes";
+                                    return true;
+                                }
+                                else if (((_e = columns[4]) === null || _e === void 0 ? void 0 : _e.trim()) === "preorder") {
+                                    marketStatus = "preorder";
+                                    return true;
+                                }
+                                else if (((_f = columns[4]) === null || _f === void 0 ? void 0 : _f.trim()) === "houston") {
+                                    marketStatus = "houston";
+                                    return true;
+                                }
+                            }
+                            return false;
+                        });
+                    }
+                    catch (error) {
+                        console.error("Error checking zip code:", error);
+                    }
+                    const useNewOnboarding = (_b = (_a = window.posthog) === null || _a === void 0 ? void 0 : _a.isFeatureEnabled) === null || _b === void 0 ? void 0 : _b.call(_a, "use-new-onboarding");
+                    let originURL = window.location.origin;
+                    let redirectPath = "/join-waitlist";
+                    if (useNewOnboarding) {
+                        originURL = "https://account.basepowercompany.com";
+                        redirectPath = "/register/LKhM3Irh"; // Default path, waitlist
+                    }
+                    // Handle different market statuses
+                    if (marketStatus === "yes" || marketStatus === "houston") {
+                        if (useNewOnboarding) {
+                            redirectPath = "/register/S1XeGMjm"; // live markets
+                        }
+                        else {
+                            redirectPath = "/join-now";
+                        }
+                    }
+                    else if (marketStatus === "preorder") {
+                        if (useNewOnboarding) {
+                            redirectPath = "/register/SCiqS9XF"; // preorder markets
+                        }
+                        else {
+                            redirectPath = "/join-soon";
+                        }
+                    }
+                    const url = new URL(redirectPath, originURL);
+                    const currentParams = new URLSearchParams(window.location.search);
+                    const selectedParams = {
+                        gclid: currentParams.get("gclid"),
+                        utm_source: currentParams.get("utm_source"),
+                        utm_medium: currentParams.get("utm_medium"),
+                        utm_campaign: currentParams.get("utm_campaign"),
+                        utm_term: currentParams.get("utm_term"),
+                        utm_content: currentParams.get("utm_content"),
+                        referrer_name: currentParams.get("referrer_name"),
+                        person_id: (_d = (_c = window.posthog) === null || _c === void 0 ? void 0 : _c.get_distinct_id) === null || _d === void 0 ? void 0 : _d.call(_c),
+                        title: (addressData === null || addressData === void 0 ? void 0 : addressData.title) || "",
+                        formatted_address: (addressData === null || addressData === void 0 ? void 0 : addressData.formattedAddress) || "",
+                        external_id: (addressData === null || addressData === void 0 ? void 0 : addressData.externalId) || "",
+                        external_url: (addressData === null || addressData === void 0 ? void 0 : addressData.externalUrl) || "",
+                        house_number: (addressData === null || addressData === void 0 ? void 0 : addressData.houseNumber) || "",
+                        street: (addressData === null || addressData === void 0 ? void 0 : addressData.street) || "",
+                        street_address: `${(addressData === null || addressData === void 0 ? void 0 : addressData.houseNumber) || ""} ${(addressData === null || addressData === void 0 ? void 0 : addressData.street) || ""}`.trim(),
+                        street_2: (addressData === null || addressData === void 0 ? void 0 : addressData.street_2) || "",
+                        city: (addressData === null || addressData === void 0 ? void 0 : addressData.city) || "",
+                        county: (addressData === null || addressData === void 0 ? void 0 : addressData.county) || "",
+                        state_short: (addressData === null || addressData === void 0 ? void 0 : addressData.stateShort) || "",
+                        state_long: (addressData === null || addressData === void 0 ? void 0 : addressData.stateLong) || "",
+                        country_code: (addressData === null || addressData === void 0 ? void 0 : addressData.countryCode) || "",
+                        country_long: (addressData === null || addressData === void 0 ? void 0 : addressData.countryLong) || "",
+                        postal_code: (addressData === null || addressData === void 0 ? void 0 : addressData.postalCode) || "",
+                    };
+                    const filteredParams = {};
+                    Object.entries(selectedParams).forEach(([k, v]) => {
+                        if (v) {
+                            filteredParams[k] = v;
+                        }
+                    });
+                    url.search = new URLSearchParams(filteredParams).toString();
+                    window.location.href = url.toString();
+                },
+            });
+        }
+        // Initialize ZIP code input
+        if (document.getElementById("zip-code-entry")) {
+            PreorderApp.initializeZipCode({
+                targetElAddressInput: document.getElementById("zip-code-entry"),
+                querySelectorClickToOpenForm: '[data-preorder="open"]',
+                addressCtaText: "Check availability",
+                onAddressSubmitSuccess: async (addressData) => {
+                    var _a, _b, _c, _d;
+                    if (window.gtag) {
+                        window.gtag("event", "zip-submit", { addressData });
+                    }
+                    window.hubspotAddressData = addressData;
+                    let marketStatus = "unavailable";
+                    try {
+                        const response = await fetch("https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv");
+                        const csvText = await response.text();
+                        const lines = csvText.split("\n");
+                        lines.slice(1).some((line) => {
+                            var _a, _b, _c, _d, _e, _f;
+                            const columns = line.split(",");
+                            if (((_a = columns[1]) === null || _a === void 0 ? void 0 : _a.trim()) === ((_c = (_b = addressData === null || addressData === void 0 ? void 0 : addressData.postalCode) === null || _b === void 0 ? void 0 : _b.trim()) === null || _c === void 0 ? void 0 : _c.substring(0, 5))) {
+                                if (((_d = columns[4]) === null || _d === void 0 ? void 0 : _d.trim()) === "yes") {
+                                    marketStatus = "yes";
+                                    return true;
+                                }
+                                else if (((_e = columns[4]) === null || _e === void 0 ? void 0 : _e.trim()) === "preorder") {
+                                    marketStatus = "preorder";
+                                    return true;
+                                }
+                                else if (((_f = columns[4]) === null || _f === void 0 ? void 0 : _f.trim()) === "houston") {
+                                    marketStatus = "houston";
+                                    return true;
+                                }
+                            }
+                            return false;
+                        });
+                    }
+                    catch (error) {
+                        console.error("Error checking zip code:", error);
+                    }
+                    const useNewOnboarding = (_b = (_a = window.posthog) === null || _a === void 0 ? void 0 : _a.isFeatureEnabled) === null || _b === void 0 ? void 0 : _b.call(_a, "use-new-onboarding");
+                    let originURL = window.location.origin;
+                    let redirectPath = "/join-waitlist";
+                    if (useNewOnboarding) {
+                        originURL = "https://account.basepowercompany.com";
+                        redirectPath = "/register/LKhM3Irh"; // Default path, waitlist
+                    }
+                    // Handle different market statuses
+                    if (marketStatus === "yes" || marketStatus === "houston") {
+                        if (useNewOnboarding) {
+                            redirectPath = "/register/S1XeGMjm"; // live markets
+                        }
+                        else {
+                            redirectPath = "/join-now";
+                        }
+                    }
+                    else if (marketStatus === "preorder") {
+                        if (useNewOnboarding) {
+                            redirectPath = "/register/SCiqS9XF"; // preorder markets
+                        }
+                        else {
+                            redirectPath = "/join-soon";
+                        }
+                    }
+                    const url = new URL(redirectPath, originURL);
+                    const currentParams = new URLSearchParams(window.location.search);
+                    const selectedParams = {
+                        gclid: currentParams.get("gclid"),
+                        utm_source: currentParams.get("utm_source"),
+                        utm_medium: currentParams.get("utm_medium"),
+                        utm_campaign: currentParams.get("utm_campaign"),
+                        utm_term: currentParams.get("utm_term"),
+                        utm_content: currentParams.get("utm_content"),
+                        referrer_name: currentParams.get("referrer_name"),
+                        person_id: (_d = (_c = window.posthog) === null || _c === void 0 ? void 0 : _c.get_distinct_id) === null || _d === void 0 ? void 0 : _d.call(_c),
+                        title: (addressData === null || addressData === void 0 ? void 0 : addressData.title) || "",
+                        formatted_address: (addressData === null || addressData === void 0 ? void 0 : addressData.formattedAddress) || "",
+                        external_id: (addressData === null || addressData === void 0 ? void 0 : addressData.externalId) || "",
+                        external_url: (addressData === null || addressData === void 0 ? void 0 : addressData.externalUrl) || "",
+                        house_number: (addressData === null || addressData === void 0 ? void 0 : addressData.houseNumber) || "",
+                        street: (addressData === null || addressData === void 0 ? void 0 : addressData.street) || "",
+                        street_address: `${(addressData === null || addressData === void 0 ? void 0 : addressData.houseNumber) || ""} ${(addressData === null || addressData === void 0 ? void 0 : addressData.street) || ""}`.trim(),
+                        street_2: (addressData === null || addressData === void 0 ? void 0 : addressData.street_2) || "",
+                        city: (addressData === null || addressData === void 0 ? void 0 : addressData.city) || "",
+                        county: (addressData === null || addressData === void 0 ? void 0 : addressData.county) || "",
+                        state_short: (addressData === null || addressData === void 0 ? void 0 : addressData.stateShort) || "",
+                        state_long: (addressData === null || addressData === void 0 ? void 0 : addressData.stateLong) || "",
+                        country_code: (addressData === null || addressData === void 0 ? void 0 : addressData.countryCode) || "",
+                        country_long: (addressData === null || addressData === void 0 ? void 0 : addressData.countryLong) || "",
+                        postal_code: (addressData === null || addressData === void 0 ? void 0 : addressData.postalCode) || "",
+                    };
+                    const filteredParams = {};
+                    Object.entries(selectedParams).forEach(([k, v]) => {
+                        if (v) {
+                            filteredParams[k] = v;
+                        }
+                    });
+                    url.search = new URLSearchParams(filteredParams).toString();
+                    window.location.href = url.toString();
+                },
+            });
+        }
+    });
+
+}));
 //# sourceMappingURL=embed.js.map

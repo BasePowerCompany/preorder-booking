@@ -1,0 +1,350 @@
+<!-- CSS first -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.31/public/preorder-app/bundle.css"
+/>
+
+<!-- Functionality scripts -->
+
+<script
+  charset="utf-8"
+  type="text/javascript"
+  src="//js-eu1.hsforms.net/forms/embed/v2.js"
+  crossorigin
+></script>
+<script
+  src="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.31/public/preorder-app/embed.js"
+  crossorigin
+></script>
+
+<!-- Two up interaction -->
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const items = document.querySelectorAll(".home-two-up-item");
+    console.log("Found items:", items.length);
+
+    items.forEach((item, index) => {
+      item.addEventListener("click", () => {
+        console.log("clicked");
+        const isExpanded = item.classList.contains("expand");
+        const otherItem = items[1 - index];
+
+        if (isExpanded) {
+          item.classList.remove("expand");
+          otherItem.classList.remove("shrink");
+        } else {
+          item.classList.add("expand");
+          item.classList.remove("shrink");
+          otherItem.classList.remove("expand");
+          otherItem.classList.add("shrink");
+        }
+      });
+    });
+  });
+</script>
+
+<!-- Pre-order app init -->
+<script>
+  posthog.onFeatureFlags(function () {
+    // Always use new routing
+    var redirectToSignupForm = true;
+    var useTypeformSignUp = true;
+
+    var useNewOnboarding = posthog.isFeatureEnabled("use-new-onboarding");
+
+    BasePreorderApp.initialize({
+      targetElsAddressInput: [
+        document.getElementById("address-form"),
+        document.getElementById("hero-address-entry"),
+      ],
+      googlePublicApiKey: "AIzaSyB0o_nPI-xjHYKg7KB0bl87Yhnf2ng9Nsg",
+      querySelectorClickToOpenForm: '[data-preorder="open"]',
+      addressCtaText: "Check availability",
+      googleSheetConfig: {
+        zipsCsvUrl:
+          "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"},
+      onAddressSelect: () => {
+        if (posthog) {
+          posthog.capture("user-submit-address-form");
+        }
+      },
+      hidePanelEl: redirectToSignupForm,
+      onAddressSubmitSuccess: async (addressData, leadType, zipConfig) => {
+        gtag("event", "address-submit", { leadType, addressData, zipConfig });
+        window.hubspotAddressData = addressData;
+
+        var marketStatus = "unavailable";
+        try {
+          const response = await fetch(
+            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
+          );
+          const csvText = await response.text();
+          const lines = csvText.split("\n");
+
+          lines.slice(1).some((line) => {
+            const columns = line.split(",");
+            if (
+              columns[1]?.trim() ===
+              addressData?.postalCode?.trim()?.substring(0, 5)
+            ) {
+              if (columns[4]?.trim() === "yes") {
+                marketStatus = "yes";
+                return true;
+              } else if (columns[4]?.trim() === "preorder") {
+                marketStatus = "preorder";
+                return true;
+              } else if (columns[4]?.trim() === "houston") {
+                marketStatus = "houston";
+                return true;
+              }
+            }
+            return false;
+          });
+        } catch (error) {
+          console.error("Error checking zip code:", error);
+        }
+
+        var originURL = window.location.origin;
+        var redirectPath = "/join-waitlist";
+
+        if (useNewOnboarding) {
+          originURL = "https://account.basepowercompany.com";
+          redirectPath = "/register/LKhM3Irh"; // Default path, waitlist
+        }
+
+        // Handle different market statuses
+        if (marketStatus === "yes" || marketStatus === "houston") {
+          if (useNewOnboarding) {
+            redirectPath = "/register/S1XeGMjm"; // live markets
+          } else {
+            redirectPath = "/join-now";
+          }
+        } else if (marketStatus === "preorder") {
+          if (useNewOnboarding) {
+            redirectPath = "/register/SCiqS9XF"; // preorder markets
+          } else {
+            redirectPath = "/join-soon";
+          }
+        }
+
+        // Keep param handling for analytics
+        var url = new URL(redirectPath, originURL);
+        var currentParams = new URLSearchParams(window.location.search);
+
+        var selectedParams = {
+          gclid: currentParams.get("gclid"),
+          utm_source: currentParams.get("utm_source"),
+          utm_medium: currentParams.get("utm_medium"),
+          utm_campaign: currentParams.get("utm_campaign"),
+          utm_term: currentParams.get("utm_term"),
+          utm_content: currentParams.get("utm_content"),
+          referrer_name: currentParams.get("referrer_name"),
+          person_id: posthog.get_distinct_id(),
+          title: addressData?.title || "",
+          formatted_address: addressData?.formattedAddress || "",
+          external_id: addressData?.externalId || "",
+          external_url: addressData?.externalUrl || "",
+          house_number: addressData?.houseNumber || "",
+          street: addressData?.street || "",
+          street_address: `${addressData?.houseNumber || ""} ${
+            addressData?.street || ""
+          }`.trim(),
+          street_2: addressData?.street_2 || "",
+          city: addressData?.city || "",
+          county: addressData?.county || "",
+          state_short: addressData?.stateShort || "",
+          state_long: addressData?.stateLong || "",
+          country_code: addressData?.countryCode || "",
+          country_long: addressData?.countryLong || "",
+          postal_code: addressData?.postalCode || "",
+        };
+
+        var filteredParams = {};
+        Object.entries(selectedParams).forEach(([k, v]) => {
+          if (v) {
+            filteredParams[k] = v;
+          }
+        });
+
+        url.search = new URLSearchParams(filteredParams).toString();
+        window.location.href = url.toString();
+      },
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const gclid = urlParams.get("gclid");
+    if (gclid) {
+      document.querySelector('input[name="gclid"]').value = gclid;
+    }
+  });
+</script>
+
+<!-- ZIP code app init -->
+<script>
+  posthog.onFeatureFlags(function () {
+    // Initialize ZIP code input independently
+    if (document.getElementById("zip-code-entry")) {
+      BasePreorderApp.initializeZipCode({
+        targetElAddressInput: document.getElementById("zip-code-entry"),
+        querySelectorClickToOpenForm: '[data-preorder="open"]',
+        addressCtaText: "Check availability",
+        onAddressSubmitSuccess: async (addressData) => {
+          gtag("event", "zip-submit", { addressData });
+          window.hubspotAddressData = addressData;
+
+          var marketStatus = "no";
+          try {
+            const response = await fetch(
+              "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
+            );
+            const csvText = await response.text();
+            const lines = csvText.split("\n");
+
+            lines.slice(1).some((line) => {
+              const columns = line.split(",");
+              if (columns[1]?.trim() === addressData?.postalCode?.trim()) {
+                if (
+                  columns[4]?.trim() === "yes" ||
+                  columns[4]?.trim() === "houston"
+                ) {
+                  marketStatus = "yes";
+                  return true;
+                }
+                else if (columns[4]?.trim() === "preorder") {
+                  marketStatus = "preorder";
+                  return true;
+                }
+              }
+              return false;
+            });
+          } catch (error) {
+            console.error("Error checking zip code:", error);
+          }
+
+          var redirectPath = "/not-available";
+          if (marketStatus === "yes") {
+            redirectPath = "/available-now";
+          } else if (marketStatus === "preorder") {
+            redirectPath = "/available-soon";
+          }
+
+          var url = new URL(redirectPath, window.location.origin);
+          var currentParams = new URLSearchParams(window.location.search);
+
+          var selectedParams = {
+            zip: addressData?.postalCode || "",
+            gclid: currentParams.get("gclid"),
+            utm_source: currentParams.get("utm_source"),
+            utm_medium: currentParams.get("utm_medium"),
+            utm_campaign: currentParams.get("utm_campaign"),
+            utm_term: currentParams.get("utm_term"),
+            utm_content: currentParams.get("utm_content"),
+            referrer_name: currentParams.get("referrer_name"),
+            person_id: posthog.get_distinct_id(),
+          };
+
+          var filteredParams = {};
+          Object.entries(selectedParams).forEach(([k, v]) => {
+            if (v) {
+              filteredParams[k] = v;
+            }
+          });
+
+          url.search = new URLSearchParams(filteredParams).toString();
+          window.location.href = url.toString();
+        },
+      });
+    }
+  });
+</script>
+
+<!-- Load Google Places API -->
+<!-- <script async type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtFCcssmw2kdWq90R_D6JDqPIqRFOYsE0&libraries=places"></script> -->
+<!-- Set autocomplete input -->
+<script>
+  // Function to initialize your autocomplete feature
+  function initializeAutocomplete() {
+    var addressInputs = [document.getElementById("Address")];
+    addressInputs.forEach(function (input) {
+      if (input) {
+        var autocompleteOptions = {
+          types: [
+            "street_address",
+            "premise",
+            "subpremise",
+            "point_of_interest",
+          ],
+          componentRestrictions: { country: ["us"] },
+        };
+
+        var autocomplete = new google.maps.places.Autocomplete(
+          input,
+          autocompleteOptions
+        );
+
+        autocomplete.setComponentRestrictions({ country: ["us"] });
+        autocomplete.setFields(["address_components", "formatted_address"]);
+        // Optional: Handle place changed event
+        autocomplete.addListener("place_changed", function () {
+          var place = autocomplete.getPlace();
+          console.log(place);
+        });
+      }
+    });
+    console.log("Autocomplete initialized");
+  }
+
+  // Function to check for Google maps API and initialize
+  function checkGoogleApi() {
+    if (window.google && window.google.maps && window.google.maps.places) {
+      // Google API is already loaded
+      initializeAutocomplete();
+    } else {
+      // Google API isn't loaded yet, wait and check again
+      setTimeout(checkGoogleApi, 100);
+    }
+  }
+
+  // Start checking for Google maps API when the DOM is fully loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    checkGoogleApi();
+  });
+
+  window.addEventListener("load", function () {
+    if (window.google && !window.google.maps) {
+      checkAndInitializeGoogleApi();
+    }
+  });
+</script>
+
+<!-- Third-party trackers last -->
+
+<!-- Google Tag Manager -->
+<script>
+  (function (w, d, s, l, i) {
+    w[l] = w[l] || [];
+    w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != "dataLayer" ? "&l=" + l : "";
+    j.defer = true;
+    j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+    f.parentNode.insertBefore(j, f);
+  })(window, document, "script", "dataLayer", "GTM-M2FQX4R6");
+</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager (noscript - for browsers with scripting disabled) -->
+<noscript
+  ><iframe
+    src="https://www.googletagmanager.com/ns.html?id=GTM-M2FQX4R6"
+    height="0"
+    width="0"
+    style="display: none; visibility: hidden"
+  ></iframe
+></noscript>
+<!-- End Google Tag Manager (noscript) -->

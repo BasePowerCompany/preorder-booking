@@ -8,22 +8,99 @@
   import { parsePlaceResult } from "./googlePlace/utils";
   import { displayBlock, displayNone, fadeIn } from "../visibilityUtils";
   import { onMount } from "svelte";
-  import { getZipStore } from "./zipData/zipStore";
-  import type { SheetDataConfig, StoredZipDataItem } from "./zipData/types";
   import type { OnAddressSubmitSuccess } from "../types";
   import { addressState } from "../windowVars";
+  import { createEventDispatcher } from "svelte";
+  import { fade } from "svelte/transition";
+  import { fadeOut } from "../visibilityUtils";
+  import { windowVars } from "../windowVars";
 
   export let targetAvailableText: string;
   export let targetDisplayAddress: string;
 
   export let googlePublicApiKey: string;
-  export let googleSheetConfig: SheetDataConfig;
   export let addressCtaText: string = "See if my home qualifies";
 
-  const { store: zipStore, load: loadZips } = getZipStore(googleSheetConfig);
+  const dispatch = createEventDispatcher();
+  let addressInput: HTMLInputElement;
+  let autocomplete: google.maps.places.Autocomplete;
+  let isFocused = false;
+  let isOverlayVisible = false;
+  let isInputFocused = false;
+  let isInputValid = false;
+  let isSubmitting = false;
+  let errorMessage = "";
+  let selectedAddress: ParsedPlaceResult | null = null;
 
-  onMount(async () => {
-    loadZips();
+  function handleInputFocus() {
+    isInputFocused = true;
+    isOverlayVisible = true;
+  }
+
+  function handleInputBlur() {
+    isInputFocused = false;
+    setTimeout(() => {
+      isOverlayVisible = false;
+    }, 200);
+  }
+
+  function handleInputChange() {
+    const value = addressInput.value.trim();
+    isInputValid = value.length > 0;
+    errorMessage = "";
+  }
+
+  function handleSubmit() {
+    if (!selectedAddress) {
+      errorMessage = "Please enter a full address.";
+      return;
+    }
+    if (
+      !selectedAddress.postalCode ||
+      !selectedAddress.houseNumber ||
+      !selectedAddress.street
+    ) {
+      errorMessage = "Please enter a full address.";
+      return;
+    }
+
+    if (!hidePanelEl) {
+      fadeIn(panelEl);
+    }
+    displayBlock(stateContainerEl);
+    displayNone(addressPanelEl);
+
+    const targetDisplayAddressEl = document.querySelector(targetDisplayAddress);
+    targetDisplayAddressEl.innerHTML = selectedAddress.formattedAddress;
+
+    displayBlock(targetAvailableStateEl);
+    displayNone(targetNotAvailableStateEl);
+    addressState.update({
+      selectedAddress,
+    });
+    onAddressSubmitSuccess?.(selectedAddress);
+  }
+
+  function handlePlaceSelect() {
+    const place = autocomplete.getPlace();
+    if (place) {
+      selectedAddress = parsePlaceResult(place);
+      onAddressSelect(selectedAddress);
+      isInputValid = true;
+      errorMessage = "";
+    }
+  }
+
+  $: if (addressInput && googlePublicApiKey) {
+    autocomplete = new google.maps.places.Autocomplete(addressInput, {
+      types: ["address"],
+      componentRestrictions: { country: "us" },
+    });
+
+    autocomplete.addListener("place_changed", handlePlaceSelect);
+  }
+
+  onMount(() => {
     jQuery(".input-address-container").on("click", function () {
       jQuery(".focus_overlay").show();
       jQuery(".input-address-container").addClass("focused");
@@ -48,70 +125,12 @@
   export let addressPanelEl: HTMLDivElement;
   export let targetAvailableStateEl: HTMLDivElement;
   export let targetNotAvailableStateEl: HTMLDivElement;
-  export let onAddressSelect: (data: ParsedPlaceResult) => void | undefined;
-  export let onAddressSubmitSuccess: OnAddressSubmitSuccess = () => {};
+  export let onAddressSelect: (data: ParsedPlaceResult) => void;
+  export let onAddressSubmitSuccess: (data: ParsedPlaceResult) => void;
   export let hidePanelEl: boolean = false;
 
   $: inputErrorMessage = "";
-  let selectedAddress: ParsedPlaceResult | undefined;
-  $: selectedAddress = undefined;
-
-  const handleSubmit = () => {
-    if (!selectedAddress) {
-      inputErrorMessage = "Please enter a full address.";
-      return;
-    }
-    if (
-      !selectedAddress.postalCode ||
-      !selectedAddress.houseNumber ||
-      !selectedAddress.street
-    ) {
-      inputErrorMessage = "Please enter a full address.";
-      return;
-    }
-
-    if (!hidePanelEl) {
-      fadeIn(panelEl);
-    }
-    displayBlock(stateContainerEl);
-    displayNone(addressPanelEl);
-
-    const targetDisplayAddressEl = document.querySelector(targetDisplayAddress);
-    targetDisplayAddressEl.innerHTML = selectedAddress.formattedAddress;
-    const foundZipItem: StoredZipDataItem | null =
-      $zipStore.find((zipItem) => {
-        return zipItem.zip === selectedAddress.postalCode;
-      }) || null;
-
-    if (foundZipItem) {
-      document.querySelector(targetAvailableText).innerHTML =
-        foundZipItem.availability;
-
-      displayBlock(targetAvailableStateEl);
-      displayNone(targetNotAvailableStateEl);
-      addressState.update({
-        selectedAddress,
-        zipConfig: foundZipItem,
-      });
-      onAddressSubmitSuccess?.(
-        selectedAddress,
-        "lead-preorder-form",
-        foundZipItem,
-      );
-    } else {
-      displayBlock(targetNotAvailableStateEl);
-      displayNone(targetAvailableStateEl);
-      addressState.update({
-        selectedAddress,
-        zipConfig: null,
-      });
-      onAddressSubmitSuccess?.(
-        selectedAddress,
-        "lead-newsletter-form",
-        foundZipItem,
-      );
-    }
-  };
+  $: selectedAddress = null;
 </script>
 
 <div class="input-address-wrap">

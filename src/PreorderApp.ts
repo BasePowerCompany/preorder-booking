@@ -15,7 +15,6 @@ export const PreorderApp = {
       targetStateContainer,
       targetAvailableText,
       targetDisplayAddress,
-      googleSheetConfig,
       onAddressSelect,
       onAddressSubmitSuccess,
       hidePanelEl,
@@ -39,7 +38,6 @@ export const PreorderApp = {
       target: targetElAddressInput,
       props: {
         googlePublicApiKey,
-        googleSheetConfig,
         targetAvailableText,
         targetDisplayAddress,
         addressPanelEl,
@@ -50,7 +48,7 @@ export const PreorderApp = {
         onAddressSelect,
         onAddressSubmitSuccess,
         hidePanelEl,
-        addressCtaText: "See if my home qualifies",
+        addressCtaText: addressCtaText || "See if my home qualifies",
       },
     });
 
@@ -62,12 +60,7 @@ export const PreorderApp = {
       targetElAddressInput = document.getElementById("zip-code-entry"),
       targetPanel,
       targetAddressPanel,
-      targetAvailableState,
-      targetNotAvailableState,
       targetStateContainer,
-      targetAvailableText,
-      targetDisplayAddress,
-      googleSheetConfig,
       onAddressSubmitSuccess,
       hidePanelEl,
       addressCtaText,
@@ -77,8 +70,6 @@ export const PreorderApp = {
     const panelEl = targetPanel ? document.querySelector(targetPanel) as HTMLDivElement : null;
     const stateContainerEl = targetStateContainer ? document.querySelector(targetStateContainer) as HTMLDivElement : null;
     const addressPanelEl = targetAddressPanel ? document.querySelector(targetAddressPanel) as HTMLDivElement : null;
-    const targetAvailableStateEl = targetAvailableState ? document.querySelector(targetAvailableState) as HTMLDivElement : null;
-    const targetNotAvailableStateEl = targetNotAvailableState ? document.querySelector(targetNotAvailableState) as HTMLDivElement : null;
 
     // Only set up close button if panelEl exists
     if (panelEl) {
@@ -93,7 +84,7 @@ export const PreorderApp = {
       target: targetElAddressInput,
       props: {
         onAddressSubmitSuccess,
-        addressCtaText,
+        addressCtaText: addressCtaText || "Check availability",
         panelEl,
         stateContainerEl,
         addressPanelEl,
