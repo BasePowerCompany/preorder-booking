@@ -1,5 +1,4 @@
 import type { ParsedPlaceResult } from "../googlePlace/utils";
-import { isTruthy } from "../utils/isTruthy";
 import type { StoredZipDataItem } from "../zipData/types";
 
 export const getStyleEl = () => {

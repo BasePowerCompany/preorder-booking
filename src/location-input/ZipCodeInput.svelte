@@ -24,7 +24,7 @@
   onMount(async () => {
     loadZips();
     const inputContainer = document.querySelector(".input-zip-container") as HTMLElement;
-    const focusOverlay = document.querySelector(".zip-focus_overlay") as HTMLElement;
+    const focusOverlay = document.querySelector(".focus_overlay") as HTMLElement;
     const input = document.querySelector(".zip-search-input") as HTMLInputElement;
 
     if (inputContainer && focusOverlay) {
@@ -203,7 +203,7 @@
 
   .input-zip-container {
     background: #fff;
-    border-radius: 8px;
+    border-radius: var(--Radius-radius-l, 8px);
     position: relative;
     z-index: 551;
     padding: 8px;
@@ -239,7 +239,7 @@
     background: #D0F585;
     color: #084D41;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--Radius-radius-m, 8px);
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
@@ -285,7 +285,7 @@
     width: 48px;
     height: 40px;
     background: #EFF1F2;
-    border-radius: 4px;
+    border-radius: var(--Radius-radius-s, 4px);
     display: flex;
     align-items: center;
     justify-content: center;

@@ -228,130 +228,118 @@
     var redirectToSignupForm = true;
     var useTypeformSignUp = true;
 
-    BasePreorderApp.initializeZipCode({
-      targetElAddressInput: document.getElementById("zip-code-entry"),
-      targetPanel: "#popup-form",
-      targetAddressPanel: "#address-popup",
-      targetAvailableState: "#preorder-base",
-      targetNotAvailableState: "#not-available",
-      targetStateContainer: "#popup-form .form-box_holder",
-      targetAvailableText: `#preorder-availability`,
-      querySelectorClickToOpenForm: '[data-preorder="open"]',
-      addressCtaText: "Check availability",
-      googleSheetConfig: {
-        zipsCsvUrl:
-          "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
-      },
-      // hubspot
-      hsFormSuccess: {
-        target: "#hubspot-preorder-form",
-        region: "na1",
-        portalId: "43873875",
-        formId: "a41c83a1-a371-4080-be84-5699814bc294",
-        onFormSubmit: () => {
-          if (posthog) {
-            posthog.capture("user-submit-hubspot-form-zip");
-          }
-          gtag("event", "preorder-submitted-zip");
+    // Initialize ZIP code input independently
+    if (document.getElementById("zip-code-entry")) {
+      BasePreorderApp.initializeZipCode({
+        targetElAddressInput: document.getElementById("zip-code-entry"),
+        targetPanel: "#popup-form",
+        targetAddressPanel: "#address-popup",
+        targetAvailableState: "#preorder-base",
+        targetNotAvailableState: "#not-available",
+        targetStateContainer: "#popup-form .form-box_holder",
+        targetAvailableText: `#preorder-availability`,
+        querySelectorClickToOpenForm: '[data-preorder="open"]',
+        addressCtaText: "Check availability",
+        googleSheetConfig: {
+          zipsCsvUrl:
+            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
         },
-        onFormSubmitted: () => {
-          window.location.href = "/newsletter-confirmation";
-        },
-      },
-      hsFormNewsletter: {
-        target: "#hubspot-email-form",
-        region: "na1",
-        portalId: "43873875",
-        formId: "bdfdc2d3-1e91-44e7-a477-02a68a93d0f9",
-        onFormSubmit: () => {
-          gtag("event", "newsletter-submitted-zip");
-        },
-        onFormSubmitted: () => {
-          window.location.href = "/newsletter-confirmation";
-        },
-      },
-      hidePanelEl: redirectToSignupForm,
-      onAddressSubmitSuccess: async (addressData, leadType, zipConfig) => {
-        gtag("event", "zip-submit", { leadType, addressData, zipConfig });
-        window.hubspotAddressData = addressData;
-
-        var marketStatus = "no";
-        try {
-          const response = await fetch(
-            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
-          );
-          const csvText = await response.text();
-          const lines = csvText.split("\n");
-
-          lines.slice(1).some((line) => {
-            const columns = line.split(",");
-            if (columns[1]?.trim() === addressData?.postalCode?.trim()) {
-              // Check for yes or houston (both count as "yes")
-              if (
-                columns[4]?.trim() === "yes" ||
-                columns[4]?.trim() === "houston"
-              ) {
-                marketStatus = "yes";
-                return true;
-              }
-              // Check for preorder
-              else if (columns[4]?.trim() === "preorder") {
-                marketStatus = "preorder";
-                return true;
-              }
+        // hubspot
+        hsFormSuccess: {
+          target: "#hubspot-preorder-form",
+          region: "na1",
+          portalId: "43873875",
+          formId: "a41c83a1-a371-4080-be84-5699814bc294",
+          onFormSubmit: () => {
+            if (posthog) {
+              posthog.capture("user-submit-hubspot-form-zip");
             }
-            return false;
-          });
-        } catch (error) {
-          console.error("Error checking zip code:", error);
-        }
+            gtag("event", "preorder-submitted-zip");
+          },
+          onFormSubmitted: () => {
+            window.location.href = "/newsletter-confirmation";
+          },
+        },
+        hsFormNewsletter: {
+          target: "#hubspot-email-form",
+          region: "na1",
+          portalId: "43873875",
+          formId: "bdfdc2d3-1e91-44e7-a477-02a68a93d0f9",
+          onFormSubmit: () => {
+            gtag("event", "newsletter-submitted-zip");
+          },
+          onFormSubmitted: () => {
+            window.location.href = "/newsletter-confirmation";
+          },
+        },
+        hidePanelEl: redirectToSignupForm,
+        onAddressSubmitSuccess: async (addressData, leadType, zipConfig) => {
+          gtag("event", "zip-submit", { leadType, addressData, zipConfig });
+          window.hubspotAddressData = addressData;
 
-        console.log("Market status determined:", marketStatus);
+          var marketStatus = "no";
+          try {
+            const response = await fetch(
+              "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
+            );
+            const csvText = await response.text();
+            const lines = csvText.split("\n");
 
-        // New simplified routing
-        var redirectPath = "/not-available";
-        if (marketStatus === "yes") {
-          redirectPath = "/available-now";
-        } else if (marketStatus === "preorder") {
-          redirectPath = "/available-soon";
-        }
-
-        // Keep param handling for analytics
-        var url = new URL(redirectPath, originURL);
-        var currentParams = new URLSearchParams(window.location.search);
-
-        var selectedParams = {
-          zip: addressData?.postalCode || "", // Add zip code to URL params
-          gclid: currentParams.get("gclid"),
-          utm_source: currentParams.get("utm_source"),
-          utm_medium: currentParams.get("utm_medium"),
-          utm_campaign: currentParams.get("utm_campaign"),
-          utm_term: currentParams.get("utm_term"),
-          utm_content: currentParams.get("utm_content"),
-          referrer_name: currentParams.get("referrer_name"),
-          person_id: posthog.get_distinct_id(),
-        };
-
-        // Filter out empty params
-        var filteredParams = {};
-        Object.entries(selectedParams).forEach(([k, v]) => {
-          if (v) {
-            filteredParams[k] = v;
+            lines.slice(1).some((line) => {
+              const columns = line.split(",");
+              if (columns[1]?.trim() === addressData?.postalCode?.trim()) {
+                if (
+                  columns[4]?.trim() === "yes" ||
+                  columns[4]?.trim() === "houston"
+                ) {
+                  marketStatus = "yes";
+                  return true;
+                }
+                else if (columns[4]?.trim() === "preorder") {
+                  marketStatus = "preorder";
+                  return true;
+                }
+              }
+              return false;
+            });
+          } catch (error) {
+            console.error("Error checking zip code:", error);
           }
-        });
 
-        console.log(
-          "Redirecting to:",
-          redirectPath,
-          "with params:",
-          filteredParams
-        );
+          var redirectPath = "/not-available";
+          if (marketStatus === "yes") {
+            redirectPath = "/available-now";
+          } else if (marketStatus === "preorder") {
+            redirectPath = "/available-soon";
+          }
 
-        url.search = new URLSearchParams(filteredParams).toString();
-        url = updateTypeformLink(url);
-        window.location.href = url.toString();
-      },
-    });
+          var url = new URL(redirectPath, window.location.origin);
+          var currentParams = new URLSearchParams(window.location.search);
+
+          var selectedParams = {
+            zip: addressData?.postalCode || "",
+            gclid: currentParams.get("gclid"),
+            utm_source: currentParams.get("utm_source"),
+            utm_medium: currentParams.get("utm_medium"),
+            utm_campaign: currentParams.get("utm_campaign"),
+            utm_term: currentParams.get("utm_term"),
+            utm_content: currentParams.get("utm_content"),
+            referrer_name: currentParams.get("referrer_name"),
+            person_id: posthog.get_distinct_id(),
+          };
+
+          var filteredParams = {};
+          Object.entries(selectedParams).forEach(([k, v]) => {
+            if (v) {
+              filteredParams[k] = v;
+            }
+          });
+
+          url.search = new URLSearchParams(filteredParams).toString();
+          window.location.href = url.toString();
+        },
+      });
+    }
   });
 </script>
 

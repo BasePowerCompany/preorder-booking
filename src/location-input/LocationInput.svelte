@@ -174,7 +174,7 @@
     align-self: stretch;
     height: 66px;
     background: #fff;
-    border-radius: var(--Radius-radius-l, 8px);
+    border-radius: 12px;
     position: relative;
     z-index: 551;
     @media screen and (max-width: 768px) {
@@ -213,7 +213,7 @@
     justify-content: center;
     align-items: center;
     gap: var(--Spacing-spacing-m, 8px);
-    border-radius: var(--Radius-radius-m, 8px);
+    border-radius: 12px;
     position: absolute;
     right: 9px;
     margin-top: -56px;
