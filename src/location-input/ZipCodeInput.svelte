@@ -94,14 +94,11 @@
 
     // Always update state and call success handler
     addressState.update({
-      selectedAddress: minimalAddress,
-      zipConfig: null
+      selectedAddress: minimalAddress
     });
 
     onAddressSubmitSuccess?.(
-      minimalAddress,
-      "lead-preorder-form",
-      null
+      minimalAddress
     );
   };
 </script>

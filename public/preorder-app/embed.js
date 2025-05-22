@@ -1645,35 +1645,35 @@
     			attr_dev(input, "pattern", "[0-9]*");
     			attr_dev(input, "class", "zip-search-input");
     			attr_dev(input, "maxlength", "5");
-    			add_location(input, file, 92, 6, 3028);
+    			add_location(input, file, 91, 6, 2975);
     			attr_dev(div0, "class", "zip-box");
     			toggle_class(div0, "filled", /*zipCode*/ ctx[1].length >= 1);
-    			add_location(div0, file, 102, 8, 3319);
+    			add_location(div0, file, 101, 8, 3266);
     			attr_dev(div1, "class", "zip-box");
     			toggle_class(div1, "filled", /*zipCode*/ ctx[1].length >= 2);
-    			add_location(div1, file, 103, 8, 3408);
+    			add_location(div1, file, 102, 8, 3355);
     			attr_dev(div2, "class", "zip-box");
     			toggle_class(div2, "filled", /*zipCode*/ ctx[1].length >= 3);
-    			add_location(div2, file, 104, 8, 3497);
+    			add_location(div2, file, 103, 8, 3444);
     			attr_dev(div3, "class", "zip-box");
     			toggle_class(div3, "filled", /*zipCode*/ ctx[1].length >= 4);
-    			add_location(div3, file, 105, 8, 3586);
+    			add_location(div3, file, 104, 8, 3533);
     			attr_dev(div4, "class", "zip-box");
     			toggle_class(div4, "filled", /*zipCode*/ ctx[1].length >= 5);
-    			add_location(div4, file, 106, 8, 3675);
+    			add_location(div4, file, 105, 8, 3622);
     			attr_dev(div5, "class", "zip-boxes");
-    			add_location(div5, file, 101, 6, 3287);
+    			add_location(div5, file, 100, 6, 3234);
     			attr_dev(div6, "class", "zip-input-layout");
-    			add_location(div6, file, 91, 4, 2991);
+    			add_location(div6, file, 90, 4, 2938);
     			attr_dev(button, "class", "submitZipButton button secondary w-button");
     			button.disabled = button_disabled_value = !/*isComplete*/ ctx[2];
-    			add_location(button, file, 109, 4, 3784);
+    			add_location(button, file, 108, 4, 3731);
     			attr_dev(div7, "class", "input-zip-container");
-    			add_location(div7, file, 90, 2, 2953);
+    			add_location(div7, file, 89, 2, 2900);
     			attr_dev(div8, "class", "input-zip-wrap");
-    			add_location(div8, file, 89, 0, 2922);
+    			add_location(div8, file, 88, 0, 2869);
     			attr_dev(div9, "class", "focus_overlay");
-    			add_location(div9, file, 118, 0, 4005);
+    			add_location(div9, file, 117, 0, 3952);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1880,14 +1880,11 @@
     		};
 
     		// Always update state and call success handler
-    		addressState.update({
-    			selectedAddress: minimalAddress,
-    			zipConfig: null
-    		});
+    		addressState.update({ selectedAddress: minimalAddress });
 
     		onAddressSubmitSuccess === null || onAddressSubmitSuccess === void 0
     		? void 0
-    		: onAddressSubmitSuccess(minimalAddress, "lead-preorder-form", null);
+    		: onAddressSubmitSuccess(minimalAddress);
     	};
 
     	const writable_props = [
