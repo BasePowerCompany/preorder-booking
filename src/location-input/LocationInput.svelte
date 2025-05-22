@@ -15,11 +15,11 @@
   import { fadeOut } from "../visibilityUtils";
   import { windowVars } from "../windowVars";
 
-  export let targetAvailableText: string;
   export let targetDisplayAddress: string;
-
   export let googlePublicApiKey: string;
   export let addressCtaText: string = "See if my home qualifies";
+  export let onAddressSelect: (data: ParsedPlaceResult) => void;
+  export let onAddressSubmitSuccess: (data: ParsedPlaceResult) => void;
 
   const dispatch = createEventDispatcher();
   let addressInput: HTMLInputElement;
@@ -51,6 +51,7 @@
   }
 
   function handleSubmit() {
+    console.log("handleSubmit called with address:", selectedAddress);
     if (!selectedAddress) {
       errorMessage = "Please enter a full address.";
       return;
@@ -58,21 +59,18 @@
 
     if (!selectedAddress.postalCode || !selectedAddress.houseNumber || !selectedAddress.street) {
       errorMessage = "Please enter a full address.";
+      console.log("Validation failed - missing required fields:", selectedAddress);
       return;
     }
 
-    fadeIn(panelEl);
-    displayBlock(stateContainerEl);
-    displayNone(addressPanelEl);
     const targetDisplayAddressEl = document.querySelector(targetDisplayAddress);
-    targetDisplayAddressEl.innerHTML = selectedAddress.formattedAddress;
-    displayBlock(targetAvailableStateEl);
-    displayNone(targetNotAvailableStateEl);
-    addressState.update({ selectedAddress });
+    if (targetDisplayAddressEl) {
+      targetDisplayAddressEl.innerHTML = selectedAddress.formattedAddress;
+    }
 
-    onAddressSubmitSuccess === null || onAddressSubmitSuccess === void 0
-    ? void 0
-    : onAddressSubmitSuccess(selectedAddress);
+    addressState.update({ selectedAddress });
+    console.log("Calling onAddressSubmitSuccess with:", selectedAddress);
+    onAddressSubmitSuccess?.(selectedAddress);
   }
 
   function handlePlaceSelect() {
@@ -83,15 +81,6 @@
       isInputValid = true;
       errorMessage = "";
     }
-  }
-
-  $: if (addressInput && googlePublicApiKey) {
-    autocomplete = new google.maps.places.Autocomplete(addressInput, {
-      types: ["address"],
-      componentRestrictions: { country: "us" },
-    });
-
-    autocomplete.addListener("place_changed", handlePlaceSelect);
   }
 
   onMount(() => {
@@ -114,14 +103,6 @@
     });
   });
 
-  export let panelEl: HTMLDivElement;
-  export let stateContainerEl: HTMLDivElement;
-  export let addressPanelEl: HTMLDivElement;
-  export let targetAvailableStateEl: HTMLDivElement;
-  export let targetNotAvailableStateEl: HTMLDivElement;
-  export let onAddressSelect: (data: ParsedPlaceResult) => void;
-  export let onAddressSubmitSuccess: (data: ParsedPlaceResult) => void;
-
   $: inputErrorMessage = "";
   $: selectedAddress = null;
 </script>
@@ -137,7 +118,9 @@
       apiKey={googlePublicApiKey}
       placeholder="Enter your home address"
       onSelect={(value) => {
+        console.log("Place selected:", value);
         const parsed = parsePlaceResult(value);
+        console.log("Parsed place result:", parsed);
         onAddressSelect?.(parsed);
         window.blur();
         inputErrorMessage = "";
@@ -147,10 +130,12 @@
       }}
       options={{
         componentRestrictions: { country: "us" },
+        types: ["address"],
+        fields: ["address_components", "formatted_address", "name", "place_id", "url"]
       }}
     />
   </div>
-  <button class="submitAddressButton button secondary w-button">
+  <button class="submitAddressButton button secondary w-button" on:click={handleSubmit}>
     {addressCtaText}
   </button>
   {#if inputErrorMessage}

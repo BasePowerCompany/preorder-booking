@@ -8,9 +8,9 @@ import { svelteSVG } from "rollup-plugin-svelte-svg";
 import typescript from "@rollup/plugin-typescript";
 import css from "rollup-plugin-css-only";
 import replace from "@rollup/plugin-replace";
-import * as sass from 'sass';
-import fs from 'fs';
-import path from 'path';
+import * as sass from "sass";
+import fs from "fs";
+import path from "path";
 
 const production = !process.env.ROLLUP_WATCH;
 const ASSET_URL =
@@ -18,12 +18,12 @@ const ASSET_URL =
 
 function copyBeforeBodyScript() {
   return {
-    name: 'copy-before-body-script',
+    name: "copy-before-body-script",
     writeBundle() {
-      const sourcePath = path.resolve('static/webflow/Home/before-body.html');
-      const targetPath = path.resolve('public/preorder-app/before-body.html');
+      const sourcePath = path.resolve("static/webflow/Home/before-body.html");
+      const targetPath = path.resolve("public/preorder-app/before-body.html");
       fs.copyFileSync(sourcePath, targetPath);
-    }
+    },
   };
 }
 
@@ -43,7 +43,7 @@ function serve() {
         {
           stdio: ["ignore", "inherit", "inherit"],
           shell: true,
-        }
+        },
       );
 
       process.on("SIGTERM", toExit);
@@ -78,7 +78,10 @@ const createRollupConfigBase = (foo) => {
           },
           scss: {
             implementation: sass,
-            renderSync: true
+            renderSync: true,
+            sassOptions: {
+              outputStyle: "compressed",
+            },
           },
         }),
 
@@ -102,8 +105,8 @@ const createRollupConfigBase = (foo) => {
       }),
       commonjs(),
       typescript({
-        sourceMap: !production,
-        inlineSources: !production,
+        sourceMap: true,
+        inlineSources: true,
       }),
 
       // In dev mode, call `npm run start` once

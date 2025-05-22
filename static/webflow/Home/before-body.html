@@ -62,7 +62,8 @@
       addressCtaText: "Check availability",
       googleSheetConfig: {
         zipsCsvUrl:
-          "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"},
+          "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
+      },
       onAddressSelect: () => {
         if (posthog) {
           posthog.capture("user-submit-address-form");
@@ -75,7 +76,7 @@
         var marketStatus = "unavailable";
         try {
           const response = await fetch(
-            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
+            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
           );
           const csvText = await response.text();
           const lines = csvText.split("\n");
@@ -198,7 +199,7 @@
           var marketStatus = "no";
           try {
             const response = await fetch(
-              "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
+              "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
             );
             const csvText = await response.text();
             const lines = csvText.split("\n");
@@ -212,8 +213,7 @@
                 ) {
                   marketStatus = "yes";
                   return true;
-                }
-                else if (columns[4]?.trim() === "preorder") {
+                } else if (columns[4]?.trim() === "preorder") {
                   marketStatus = "preorder";
                   return true;
                 }
@@ -282,7 +282,7 @@
 
         var autocomplete = new google.maps.places.Autocomplete(
           input,
-          autocompleteOptions
+          autocompleteOptions,
         );
 
         autocomplete.setComponentRestrictions({ country: ["us"] });

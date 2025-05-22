@@ -6,9 +6,6 @@
 
   export let addressCtaText: string = "See if I qualify";
   export let onAddressSubmitSuccess: OnAddressSubmitSuccess = () => {};
-  export let panelEl: HTMLDivElement | null = null;
-  export let stateContainerEl: HTMLDivElement | null = null;
-  export let addressPanelEl: HTMLDivElement | null = null;
 
   onMount(() => {
     const inputContainer = document.querySelector(".input-zip-container") as HTMLElement;
@@ -59,21 +56,6 @@
       return;
     }
 
-    // Only try to show panel if it exists
-    if (panelEl) {
-      fadeIn(panelEl);
-    }
-
-    // Only try to show/hide state container if it exists
-    if (stateContainerEl) {
-      displayBlock(stateContainerEl);
-    }
-
-    // Only try to hide address panel if it exists
-    if (addressPanelEl) {
-      displayNone(addressPanelEl);
-    }
-
     // Create a minimal address object for consistency with LocationInput
     const minimalAddress = {
       title: "",
@@ -97,9 +79,7 @@
       selectedAddress: minimalAddress
     });
 
-    onAddressSubmitSuccess?.(
-      minimalAddress
-    );
+    onAddressSubmitSuccess?.(minimalAddress);
   };
 </script>
 

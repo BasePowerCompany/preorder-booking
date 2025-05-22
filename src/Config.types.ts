@@ -1,17 +1,22 @@
-import type { OnAddressSubmitSuccess } from "./types";
+import type { ParsedPlaceResult } from "./location-input/googlePlace/utils";
+
+export type OnAddressSubmitSuccess = (
+  data: ParsedPlaceResult,
+  leadType?: string,
+  zipConfig?: {
+    servingNow?: string;
+    [key: string]: any;
+  },
+) => void;
 
 export interface PreorderAppConfig {
   targetElAddressInput?: HTMLElement;
   googlePublicApiKey?: string;
-  targetPanel?: string;
-  targetAddressPanel?: string;
-  targetAvailableState?: string;
-  targetNotAvailableState?: string;
-  targetStateContainer?: string;
-  targetAvailableText?: string;
-  targetDisplayAddress?: string;
-  querySelectorClickToOpenForm?: string;
-  addressCtaText?: string;
-  onAddressSelect?: () => void;
+  onAddressSelect?: (data: ParsedPlaceResult) => void;
   onAddressSubmitSuccess?: OnAddressSubmitSuccess;
+  addressCtaText?: string;
+  googleSheetConfig?: {
+    zipsCsvUrl: string;
+  };
+  querySelectorClickToOpenForm?: string;
 }

@@ -19,6 +19,7 @@ npm run dev
 ```
 
 Make sure you have `node` installed to run this project.
+
 ```
 
 As a simple solution for js and css delivery we are using [jsDelivery](https://www.jsdelivr.com/), for that reason the build code **must be included in the git**. You will need to make a new release version of the repository to promote new changes.

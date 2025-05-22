@@ -3,9 +3,7 @@
 import type { ParsedPlaceResult } from "./location-input/googlePlace/utils";
 
 const createWindowState = (key: string) => ({
-  update: (data: {
-    selectedAddress?: ParsedPlaceResult;
-  }) => {
+  update: (data: { selectedAddress?: ParsedPlaceResult }) => {
     try {
       window[key] = {
         ...window[key],

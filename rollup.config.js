@@ -1,4 +1,4 @@
-import { createRollupConfig } from './rollup.createConfig.js';
+import { createRollupConfig } from "./rollup.createConfig.js";
 
 export default [
   createRollupConfig((config) => {

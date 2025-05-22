@@ -1,56 +1,56 @@
 import type { PreorderAppConfig } from "./Config.types";
 import LocationInput from "./location-input/LocationInput.svelte";
 import ZipCodeInput from "./location-input/ZipCodeInput.svelte";
-import { fadeOut } from "./visibilityUtils";
 
 export const PreorderApp = {
   initialize: (props: PreorderAppConfig) => {
     const {
       targetElAddressInput = document.getElementById("hero-address-entry"),
       googlePublicApiKey,
-      targetPanel,
-      targetAddressPanel,
-      targetAvailableState,
-      targetNotAvailableState,
-      targetStateContainer,
-      targetAvailableText,
-      targetDisplayAddress,
-      googleSheetConfig,
       onAddressSelect,
       onAddressSubmitSuccess,
       addressCtaText,
+      querySelectorClickToOpenForm,
     } = props;
-
-    const panelEl = document.querySelector(targetPanel) as HTMLDivElement;
-    const stateContainerEl = document.querySelector(targetStateContainer) as HTMLDivElement;
-    const addressPanelEl = document.querySelector(targetAddressPanel) as HTMLDivElement;
-    const targetAvailableStateEl = document.querySelector(targetAvailableState) as HTMLDivElement;
-    const targetNotAvailableStateEl = document.querySelector(targetNotAvailableState) as HTMLDivElement;
-
-    // Set up close button
-    document.querySelectorAll(".close-button").forEach((el) => {
-      el.addEventListener("click", () => {
-        fadeOut(panelEl);
-      });
-    });
 
     const locationInput = new LocationInput({
       target: targetElAddressInput,
       props: {
         googlePublicApiKey,
-        googleSheetConfig,
-        targetAvailableText,
-        targetDisplayAddress,
-        addressPanelEl,
-        targetAvailableStateEl,
-        stateContainerEl,
-        panelEl,
-        targetNotAvailableStateEl,
         onAddressSelect,
         onAddressSubmitSuccess,
         addressCtaText: "See if my home qualifies",
+        targetDisplayAddress: "#hero-address-entry",
       },
     });
+
+    // Add click-to-open logic if selector is provided
+    if (querySelectorClickToOpenForm && targetElAddressInput) {
+      const triggerEls = document.querySelectorAll(
+        querySelectorClickToOpenForm,
+      );
+      triggerEls.forEach((el) => {
+        el.addEventListener("click", () => {
+          // Scroll to the form
+          targetElAddressInput.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+          // Simulate a click on the input-address-container to trigger overlay/focus
+          const container = targetElAddressInput.querySelector(
+            ".input-address-container",
+          );
+          if (container) {
+            container.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+          }
+          // Optionally, focus the input as well
+          const input = targetElAddressInput.querySelector("input");
+          if (input) {
+            input.focus();
+          }
+        });
+      });
+    }
 
     return locationInput;
   },
@@ -58,44 +58,41 @@ export const PreorderApp = {
   initializeZipCode: (props: PreorderAppConfig) => {
     const {
       targetElAddressInput = document.getElementById("zip-code-entry"),
-      targetPanel,
-      targetAddressPanel,
-      targetAvailableState,
-      targetNotAvailableState,
-      targetStateContainer,
-      targetAvailableText,
-      targetDisplayAddress,
-      googleSheetConfig,
       onAddressSubmitSuccess,
       addressCtaText,
+      querySelectorClickToOpenForm,
     } = props;
-
-    // Only initialize panel elements if they are provided
-    const panelEl = targetPanel ? document.querySelector(targetPanel) as HTMLDivElement : null;
-    const stateContainerEl = targetStateContainer ? document.querySelector(targetStateContainer) as HTMLDivElement : null;
-    const addressPanelEl = targetAddressPanel ? document.querySelector(targetAddressPanel) as HTMLDivElement : null;
-    const targetAvailableStateEl = targetAvailableState ? document.querySelector(targetAvailableState) as HTMLDivElement : null;
-    const targetNotAvailableStateEl = targetNotAvailableState ? document.querySelector(targetNotAvailableState) as HTMLDivElement : null;
-
-    // Only set up close button if panelEl exists
-    if (panelEl) {
-      document.querySelectorAll(".close-button").forEach((el) => {
-        el.addEventListener("click", () => {
-          fadeOut(panelEl);
-        });
-      });
-    }
 
     const zipCodeInput = new ZipCodeInput({
       target: targetElAddressInput,
       props: {
         onAddressSubmitSuccess,
         addressCtaText,
-        panelEl,
-        stateContainerEl,
-        addressPanelEl,
       },
     });
+
+    // Add click-to-open logic if selector is provided
+    if (querySelectorClickToOpenForm && targetElAddressInput) {
+      const triggerEls = document.querySelectorAll(
+        querySelectorClickToOpenForm,
+      );
+      triggerEls.forEach((el) => {
+        el.addEventListener("click", () => {
+          // Find the input inside the target element and focus it
+          const input = targetElAddressInput.querySelector("input");
+          if (input) {
+            input.focus();
+            // Optionally, add a 'focused' class to the container
+            const container = targetElAddressInput.querySelector(
+              ".input-zip-container",
+            );
+            if (container) {
+              container.classList.add("focused");
+            }
+          }
+        });
+      });
+    }
 
     return zipCodeInput;
   },
