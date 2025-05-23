@@ -1,99 +1,56 @@
 import type { PreorderAppConfig } from "./Config.types";
-import { initializeHubspotForms } from "./initializeForms";
 import LocationInput from "./location-input/LocationInput.svelte";
 import ZipCodeInput from "./location-input/ZipCodeInput.svelte";
-import { fadeOut } from "./visibilityUtils";
 
 export const PreorderApp = {
   initialize: (props: PreorderAppConfig) => {
     const {
       targetElAddressInput = document.getElementById("hero-address-entry"),
       googlePublicApiKey,
-      targetPanel,
-      targetAddressPanel,
-      targetAvailableState,
-      targetNotAvailableState,
-      targetStateContainer,
-      targetAvailableText,
-      targetDisplayAddress,
-      googleSheetConfig,
-      hsFormSuccess,
-      hsFormNewsletter,
-      querySelectorClickToOpenForm,
       onAddressSelect,
       onAddressSubmitSuccess,
-      hidePanelEl,
       addressCtaText,
+      querySelectorClickToOpenForm,
     } = props;
-
-    initializeHubspotForms({
-      hsFormSuccess,
-      hsFormNewsletter,
-    });
-
-    const panelEl = document.querySelector(targetPanel) as HTMLDivElement;
-    const stateContainerEl = document.querySelector(
-      targetStateContainer,
-    ) as HTMLDivElement;
-
-    const addressPanelEl = document.querySelector(
-      targetAddressPanel,
-    ) as HTMLDivElement;
-    const targetAvailableStateEl = document.querySelector(
-      targetAvailableState,
-    ) as HTMLDivElement;
-    const targetNotAvailableStateEl = document.querySelector(
-      targetNotAvailableState,
-    ) as HTMLDivElement;
-
-    // open form button actions
-    document.querySelectorAll(querySelectorClickToOpenForm).forEach((el) => {
-      el.addEventListener("click", (e) => {
-        e.preventDefault();
-        targetElAddressInput.scrollIntoView({
-          behavior: "smooth",
-        });
-
-        const y =
-          targetElAddressInput.getBoundingClientRect().top +
-          window.scrollY -
-          300;
-
-        window.scrollTo({ top: y, behavior: "smooth" });
-
-        setTimeout(() => {
-          targetElAddressInput.querySelector("input").focus();
-        }, 1000);
-      });
-    });
-
-    /**
-     * close button
-     */
-    document.querySelectorAll(".close-button").forEach((el) => {
-      el.addEventListener("click", () => {
-        fadeOut(panelEl);
-      });
-    });
 
     const locationInput = new LocationInput({
       target: targetElAddressInput,
       props: {
         googlePublicApiKey,
-        googleSheetConfig,
-        targetAvailableText,
-        targetDisplayAddress,
-        addressPanelEl,
-        targetAvailableStateEl,
-        stateContainerEl,
-        panelEl,
-        targetNotAvailableStateEl,
         onAddressSelect,
         onAddressSubmitSuccess,
-        hidePanelEl,
         addressCtaText: "See if my home qualifies",
+        targetDisplayAddress: "#hero-address-entry",
       },
     });
+
+    // Add click-to-open logic if selector is provided
+    if (querySelectorClickToOpenForm && targetElAddressInput) {
+      const triggerEls = document.querySelectorAll(
+        querySelectorClickToOpenForm,
+      );
+      triggerEls.forEach((el) => {
+        el.addEventListener("click", () => {
+          // Scroll to the form
+          targetElAddressInput.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+          // Simulate a click on the input-address-container to trigger overlay/focus
+          const container = targetElAddressInput.querySelector(
+            ".input-address-container",
+          );
+          if (container) {
+            container.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+          }
+          // Optionally, focus the input as well
+          const input = targetElAddressInput.querySelector("input");
+          if (input) {
+            input.focus();
+          }
+        });
+      });
+    }
 
     return locationInput;
   },
@@ -101,86 +58,41 @@ export const PreorderApp = {
   initializeZipCode: (props: PreorderAppConfig) => {
     const {
       targetElAddressInput = document.getElementById("zip-code-entry"),
-      googlePublicApiKey,
-      targetPanel,
-      targetAddressPanel,
-      targetAvailableState,
-      targetNotAvailableState,
-      targetStateContainer,
-      targetAvailableText,
-      targetDisplayAddress,
-      googleSheetConfig,
-      hsFormSuccess,
-      hsFormNewsletter,
-      querySelectorClickToOpenForm,
       onAddressSubmitSuccess,
-      hidePanelEl,
       addressCtaText,
+      querySelectorClickToOpenForm,
     } = props;
-
-    // Initialize Hubspot forms independently
-    if (hsFormSuccess || hsFormNewsletter) {
-      initializeHubspotForms({
-        hsFormSuccess,
-        hsFormNewsletter,
-      });
-    }
-
-    // Only initialize panel elements if they are provided
-    const panelEl = targetPanel ? document.querySelector(targetPanel) as HTMLDivElement : null;
-    const stateContainerEl = targetStateContainer ? document.querySelector(targetStateContainer) as HTMLDivElement : null;
-    const addressPanelEl = targetAddressPanel ? document.querySelector(targetAddressPanel) as HTMLDivElement : null;
-    const targetAvailableStateEl = targetAvailableState ? document.querySelector(targetAvailableState) as HTMLDivElement : null;
-    const targetNotAvailableStateEl = targetNotAvailableState ? document.querySelector(targetNotAvailableState) as HTMLDivElement : null;
-
-    // Only set up click handlers if querySelectorClickToOpenForm is provided
-    if (querySelectorClickToOpenForm) {
-      document.querySelectorAll(querySelectorClickToOpenForm).forEach((el) => {
-        el.addEventListener("click", (e) => {
-          e.preventDefault();
-          targetElAddressInput.scrollIntoView({
-            behavior: "smooth",
-          });
-
-          const y =
-            targetElAddressInput.getBoundingClientRect().top +
-            window.scrollY -
-            300;
-
-          window.scrollTo({ top: y, behavior: "smooth" });
-
-          setTimeout(() => {
-            targetElAddressInput.querySelector("input").focus();
-          }, 1000);
-        });
-      });
-    }
-
-    // Only set up close button if panelEl exists
-    if (panelEl) {
-      document.querySelectorAll(".close-button").forEach((el) => {
-        el.addEventListener("click", () => {
-          fadeOut(panelEl);
-        });
-      });
-    }
 
     const zipCodeInput = new ZipCodeInput({
       target: targetElAddressInput,
       props: {
-        googleSheetConfig,
         onAddressSubmitSuccess,
         addressCtaText,
-        panelEl,
-        stateContainerEl,
-        addressPanelEl,
-        targetAvailableStateEl,
-        targetNotAvailableStateEl,
-        targetAvailableText,
-        targetDisplayAddress,
-        hidePanelEl,
       },
     });
+
+    // Add click-to-open logic if selector is provided
+    if (querySelectorClickToOpenForm && targetElAddressInput) {
+      const triggerEls = document.querySelectorAll(
+        querySelectorClickToOpenForm,
+      );
+      triggerEls.forEach((el) => {
+        el.addEventListener("click", () => {
+          // Find the input inside the target element and focus it
+          const input = targetElAddressInput.querySelector("input");
+          if (input) {
+            input.focus();
+            // Optionally, add a 'focused' class to the container
+            const container = targetElAddressInput.querySelector(
+              ".input-zip-container",
+            );
+            if (container) {
+              container.classList.add("focused");
+            }
+          }
+        });
+      });
+    }
 
     return zipCodeInput;
   },

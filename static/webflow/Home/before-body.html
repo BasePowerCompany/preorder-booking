@@ -58,55 +58,17 @@
         document.getElementById("hero-address-entry"),
       ],
       googlePublicApiKey: "AIzaSyB0o_nPI-xjHYKg7KB0bl87Yhnf2ng9Nsg",
-      targetPanel: "#popup-form",
-      targetAddressPanel: "#address-popup",
-      targetAvailableState: "#preorder-base",
-      targetNotAvailableState: "#not-available",
-      targetStateContainer: "#popup-form .form-box_holder",
-      targetAvailableText: `#preorder-availability`,
-      targetDisplayAddress: `#service-address`,
       querySelectorClickToOpenForm: '[data-preorder="open"]',
       addressCtaText: "Check availability",
       googleSheetConfig: {
         zipsCsvUrl:
           "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
       },
-      // hubspot
-      hsFormSuccess: {
-        target: "#hubspot-preorder-form",
-        region: "na1",
-        portalId: "43873875",
-        formId: "a41c83a1-a371-4080-be84-5699814bc294",
-        onFormSubmit: () => {
-          if (posthog) {
-            posthog.capture("user-submit-hubspot-form");
-          }
-          gtag("event", "preorder-submitted");
-        },
-        onFormSubmitted: () => {
-          // Default to newsletter confirmation
-          window.location.href = "/newsletter-confirmation";
-        },
-      },
-      hsFormNewsletter: {
-        target: "#hubspot-email-form",
-        region: "na1",
-        portalId: "43873875",
-        formId: "bdfdc2d3-1e91-44e7-a477-02a68a93d0f9",
-        onFormSubmit: () => {
-          gtag("event", "newsletter-submitted");
-        },
-        onFormSubmitted: () => {
-          // redirect is now controlled from here
-          window.location.href = "/newsletter-confirmation";
-        },
-      },
       onAddressSelect: () => {
         if (posthog) {
           posthog.capture("user-submit-address-form");
         }
       },
-      hidePanelEl: redirectToSignupForm,
       onAddressSubmitSuccess: async (addressData, leadType, zipConfig) => {
         gtag("event", "address-submit", { leadType, addressData, zipConfig });
         window.hubspotAddressData = addressData;
@@ -114,7 +76,7 @@
         var marketStatus = "unavailable";
         try {
           const response = await fetch(
-            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
+            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
           );
           const csvText = await response.text();
           const lines = csvText.split("\n");
@@ -224,134 +186,78 @@
 <!-- ZIP code app init -->
 <script>
   posthog.onFeatureFlags(function () {
-    // Always use new routing
-    var redirectToSignupForm = true;
-    var useTypeformSignUp = true;
+    // Initialize ZIP code input independently
+    if (document.getElementById("zip-code-entry")) {
+      BasePreorderApp.initializeZipCode({
+        targetElAddressInput: document.getElementById("zip-code-entry"),
+        querySelectorClickToOpenForm: '[data-preorder="open"]',
+        addressCtaText: "Check availability",
+        onAddressSubmitSuccess: async (addressData) => {
+          gtag("event", "zip-submit", { addressData });
+          window.hubspotAddressData = addressData;
 
-    BasePreorderApp.initializeZipCode({
-      targetElAddressInput: document.getElementById("zip-code-entry"),
-      targetPanel: "#popup-form",
-      targetAddressPanel: "#address-popup",
-      targetAvailableState: "#preorder-base",
-      targetNotAvailableState: "#not-available",
-      targetStateContainer: "#popup-form .form-box_holder",
-      targetAvailableText: `#preorder-availability`,
-      querySelectorClickToOpenForm: '[data-preorder="open"]',
-      addressCtaText: "Check availability",
-      googleSheetConfig: {
-        zipsCsvUrl:
-          "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
-      },
-      // hubspot
-      hsFormSuccess: {
-        target: "#hubspot-preorder-form",
-        region: "na1",
-        portalId: "43873875",
-        formId: "a41c83a1-a371-4080-be84-5699814bc294",
-        onFormSubmit: () => {
-          if (posthog) {
-            posthog.capture("user-submit-hubspot-form-zip");
+          var marketStatus = "no";
+          try {
+            const response = await fetch(
+              "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
+            );
+            const csvText = await response.text();
+            const lines = csvText.split("\n");
+
+            lines.slice(1).some((line) => {
+              const columns = line.split(",");
+              if (columns[1]?.trim() === addressData?.postalCode?.trim()) {
+                if (
+                  columns[4]?.trim() === "yes" ||
+                  columns[4]?.trim() === "houston"
+                ) {
+                  marketStatus = "yes";
+                  return true;
+                } else if (columns[4]?.trim() === "preorder") {
+                  marketStatus = "preorder";
+                  return true;
+                }
+              }
+              return false;
+            });
+          } catch (error) {
+            console.error("Error checking zip code:", error);
           }
-          gtag("event", "preorder-submitted-zip");
-        },
-        onFormSubmitted: () => {
-          window.location.href = "/newsletter-confirmation";
-        },
-      },
-      hsFormNewsletter: {
-        target: "#hubspot-email-form",
-        region: "na1",
-        portalId: "43873875",
-        formId: "bdfdc2d3-1e91-44e7-a477-02a68a93d0f9",
-        onFormSubmit: () => {
-          gtag("event", "newsletter-submitted-zip");
-        },
-        onFormSubmitted: () => {
-          window.location.href = "/newsletter-confirmation";
-        },
-      },
-      hidePanelEl: redirectToSignupForm,
-      onAddressSubmitSuccess: async (addressData, leadType, zipConfig) => {
-        gtag("event", "zip-submit", { leadType, addressData, zipConfig });
-        window.hubspotAddressData = addressData;
 
-        var marketStatus = "no";
-        try {
-          const response = await fetch(
-            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
-          );
-          const csvText = await response.text();
-          const lines = csvText.split("\n");
+          var redirectPath = "/not-available";
+          if (marketStatus === "yes") {
+            redirectPath = "/available-now";
+          } else if (marketStatus === "preorder") {
+            redirectPath = "/available-soon";
+          }
 
-          lines.slice(1).some((line) => {
-            const columns = line.split(",");
-            if (columns[1]?.trim() === addressData?.postalCode?.trim()) {
-              // Check for yes or houston (both count as "yes")
-              if (
-                columns[4]?.trim() === "yes" ||
-                columns[4]?.trim() === "houston"
-              ) {
-                marketStatus = "yes";
-                return true;
-              }
-              // Check for preorder
-              else if (columns[4]?.trim() === "preorder") {
-                marketStatus = "preorder";
-                return true;
-              }
+          var url = new URL(redirectPath, window.location.origin);
+          var currentParams = new URLSearchParams(window.location.search);
+
+          var selectedParams = {
+            zip: addressData?.postalCode || "",
+            gclid: currentParams.get("gclid"),
+            utm_source: currentParams.get("utm_source"),
+            utm_medium: currentParams.get("utm_medium"),
+            utm_campaign: currentParams.get("utm_campaign"),
+            utm_term: currentParams.get("utm_term"),
+            utm_content: currentParams.get("utm_content"),
+            referrer_name: currentParams.get("referrer_name"),
+            person_id: posthog.get_distinct_id(),
+          };
+
+          var filteredParams = {};
+          Object.entries(selectedParams).forEach(([k, v]) => {
+            if (v) {
+              filteredParams[k] = v;
             }
-            return false;
           });
-        } catch (error) {
-          console.error("Error checking zip code:", error);
-        }
 
-        console.log("Market status determined:", marketStatus);
-
-        // New simplified routing
-        var redirectPath = "/not-available";
-        if (marketStatus === "yes") {
-          redirectPath = "/available-now";
-        } else if (marketStatus === "preorder") {
-          redirectPath = "/available-soon";
-        }
-
-        // Keep param handling for analytics
-        var url = new URL(redirectPath, originURL);
-        var currentParams = new URLSearchParams(window.location.search);
-
-        var selectedParams = {
-          zip: addressData?.postalCode || "", // Add zip code to URL params
-          gclid: currentParams.get("gclid"),
-          utm_source: currentParams.get("utm_source"),
-          utm_medium: currentParams.get("utm_medium"),
-          utm_campaign: currentParams.get("utm_campaign"),
-          utm_term: currentParams.get("utm_term"),
-          utm_content: currentParams.get("utm_content"),
-          referrer_name: currentParams.get("referrer_name"),
-          person_id: posthog.get_distinct_id(),
-        };
-
-        // Filter out empty params
-        var filteredParams = {};
-        Object.entries(selectedParams).forEach(([k, v]) => {
-          if (v) {
-            filteredParams[k] = v;
-          }
-        });
-
-        console.log(
-          "Redirecting to:",
-          redirectPath,
-          "with params:",
-          filteredParams
-        );
-
-        url.search = new URLSearchParams(filteredParams).toString();
-        url = updateTypeformLink(url);
-        window.location.href = url.toString();
-      },
-    });
+          url.search = new URLSearchParams(filteredParams).toString();
+          window.location.href = url.toString();
+        },
+      });
+    }
   });
 </script>
 
@@ -376,7 +282,7 @@
 
         var autocomplete = new google.maps.places.Autocomplete(
           input,
-          autocompleteOptions
+          autocompleteOptions,
         );
 
         autocomplete.setComponentRestrictions({ country: ["us"] });

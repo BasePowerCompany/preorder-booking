@@ -6,25 +6,84 @@
   import GooglePlaceAutocomplete from "./googlePlace/GooglePlaceAutocomplete.svelte";
   import type { ParsedPlaceResult } from "./googlePlace/utils";
   import { parsePlaceResult } from "./googlePlace/utils";
-  import { setHiddenHubspotInputs } from "./hubspot/hsFormUtils";
   import { displayBlock, displayNone, fadeIn } from "../visibilityUtils";
   import { onMount } from "svelte";
-  import { getZipStore } from "./zipData/zipStore";
-  import type { SheetDataConfig, StoredZipDataItem } from "./zipData/types";
   import type { OnAddressSubmitSuccess } from "../types";
-  import { hsFormStateBooking } from "../windowVars";
+  import { addressState } from "../windowVars";
+  import { createEventDispatcher } from "svelte";
+  import { fade } from "svelte/transition";
+  import { fadeOut } from "../visibilityUtils";
+  import { windowVars } from "../windowVars";
 
-  export let targetAvailableText: string;
   export let targetDisplayAddress: string;
-
   export let googlePublicApiKey: string;
-  export let googleSheetConfig: SheetDataConfig;
   export let addressCtaText: string = "See if my home qualifies";
+  export let onAddressSelect: (data: ParsedPlaceResult) => void;
+  export let onAddressSubmitSuccess: (data: ParsedPlaceResult) => void;
 
-  const { store: zipStore, load: loadZips } = getZipStore(googleSheetConfig);
+  const dispatch = createEventDispatcher();
+  let addressInput: HTMLInputElement;
+  let autocomplete: google.maps.places.Autocomplete;
+  let isFocused = false;
+  let isOverlayVisible = false;
+  let isInputFocused = false;
+  let isInputValid = false;
+  let isSubmitting = false;
+  let errorMessage = "";
+  let selectedAddress: ParsedPlaceResult | null = null;
 
-  onMount(async () => {
-    loadZips();
+  function handleInputFocus() {
+    isInputFocused = true;
+    isOverlayVisible = true;
+  }
+
+  function handleInputBlur() {
+    isInputFocused = false;
+    setTimeout(() => {
+      isOverlayVisible = false;
+    }, 200);
+  }
+
+  function handleInputChange() {
+    const value = addressInput.value.trim();
+    isInputValid = value.length > 0;
+    errorMessage = "";
+  }
+
+  function handleSubmit() {
+    console.log("handleSubmit called with address:", selectedAddress);
+    if (!selectedAddress) {
+      errorMessage = "Please enter a full address.";
+      return;
+    }
+
+    if (!selectedAddress.postalCode || !selectedAddress.houseNumber || !selectedAddress.street) {
+      errorMessage = "Please enter a full address.";
+      console.log("Validation failed - missing required fields:", selectedAddress);
+      return;
+    }
+
+    const targetDisplayAddressEl = document.querySelector(targetDisplayAddress);
+    if (targetDisplayAddressEl) {
+      targetDisplayAddressEl.innerHTML = selectedAddress.formattedAddress;
+    }
+
+    addressState.update({ selectedAddress });
+    console.log("Calling onAddressSubmitSuccess with:", selectedAddress);
+    onAddressSubmitSuccess?.(selectedAddress);
+  }
+
+  function handlePlaceSelect() {
+    const place = autocomplete.getPlace();
+    if (place) {
+      selectedAddress = parsePlaceResult(place);
+      onAddressSelect(selectedAddress);
+      isInputValid = true;
+      errorMessage = "";
+    }
+  }
+
+  onMount(() => {
     jQuery(".input-address-container").on("click", function () {
       jQuery(".focus_overlay").show();
       jQuery(".input-address-container").addClass("focused");
@@ -44,81 +103,8 @@
     });
   });
 
-  export let panelEl: HTMLDivElement;
-  export let stateContainerEl: HTMLDivElement;
-  export let addressPanelEl: HTMLDivElement;
-  export let targetAvailableStateEl: HTMLDivElement;
-  export let targetNotAvailableStateEl: HTMLDivElement;
-  export let onAddressSelect: (data: ParsedPlaceResult) => void | undefined;
-  export let onAddressSubmitSuccess: OnAddressSubmitSuccess = () => {};
-  export let hidePanelEl: boolean = false;
-
   $: inputErrorMessage = "";
-  let selectedAddress: ParsedPlaceResult | undefined;
-  $: selectedAddress = undefined;
-
-  const handleSubmit = () => {
-    if (!selectedAddress) {
-      inputErrorMessage = "Please enter a full address.";
-      return;
-    }
-    if (
-      !selectedAddress.postalCode ||
-      !selectedAddress.houseNumber ||
-      !selectedAddress.street
-    ) {
-      inputErrorMessage = "Please enter a full address.";
-      return;
-    }
-
-    if (!hidePanelEl) {
-      fadeIn(panelEl);
-    }
-    displayBlock(stateContainerEl);
-    displayNone(addressPanelEl);
-
-    const targetDisplayAddressEl = document.querySelector(targetDisplayAddress);
-    targetDisplayAddressEl.innerHTML = selectedAddress.formattedAddress;
-    const foundZipItem: StoredZipDataItem | null =
-      $zipStore.find((zipItem) => {
-        return zipItem.zip === selectedAddress.postalCode;
-      }) || null;
-
-    if (foundZipItem) {
-      document.querySelector(targetAvailableText).innerHTML =
-        foundZipItem.availability;
-
-      displayBlock(targetAvailableStateEl);
-      displayNone(targetNotAvailableStateEl);
-      setHiddenHubspotInputs(
-        window.hsFormPreorder,
-        selectedAddress,
-        foundZipItem,
-      );
-      hsFormStateBooking.update({
-        selectedAddress,
-        zipConfig: foundZipItem,
-      });
-      onAddressSubmitSuccess?.(
-        selectedAddress,
-        "lead-preorder-form",
-        foundZipItem,
-      );
-    } else {
-      displayBlock(targetNotAvailableStateEl);
-      displayNone(targetAvailableStateEl);
-      setHiddenHubspotInputs(window.hsFormNewsletter, selectedAddress);
-      hsFormStateBooking.update({
-        selectedAddress,
-        zipConfig: null,
-      });
-      onAddressSubmitSuccess?.(
-        selectedAddress,
-        "lead-newsletter-form",
-        foundZipItem,
-      );
-    }
-  };
+  $: selectedAddress = null;
 </script>
 
 <div class="input-address-wrap">
@@ -132,7 +118,9 @@
       apiKey={googlePublicApiKey}
       placeholder="Enter your home address"
       onSelect={(value) => {
+        console.log("Place selected:", value);
         const parsed = parsePlaceResult(value);
+        console.log("Parsed place result:", parsed);
         onAddressSelect?.(parsed);
         window.blur();
         inputErrorMessage = "";
@@ -142,10 +130,12 @@
       }}
       options={{
         componentRestrictions: { country: "us" },
+        types: ["address"],
+        fields: ["address_components", "formatted_address", "name", "place_id", "url"]
       }}
     />
   </div>
-  <button class="submitAddressButton button secondary w-button">
+  <button class="submitAddressButton button secondary w-button" on:click={handleSubmit}>
     {addressCtaText}
   </button>
   {#if inputErrorMessage}
@@ -155,13 +145,6 @@
   {/if}
 </div>
 <div class="focus_overlay"></div>
-
-<svelte:head>
-  <script
-    charset="utf-8"
-    src="//js-eu1.hsforms.net/forms/embed/v2.js"
-  ></script>
-</svelte:head>
 
 <style lang="scss" global>
   .input-address-container {
@@ -174,7 +157,7 @@
     align-self: stretch;
     height: 66px;
     background: #fff;
-    border-radius: var(--Radius-radius-l, 8px);
+    border-radius: 12px;
     position: relative;
     z-index: 551;
     @media screen and (max-width: 768px) {
@@ -213,7 +196,7 @@
     justify-content: center;
     align-items: center;
     gap: var(--Spacing-spacing-m, 8px);
-    border-radius: var(--Radius-radius-m, 8px);
+    border-radius: 12px;
     position: absolute;
     right: 9px;
     margin-top: -56px;

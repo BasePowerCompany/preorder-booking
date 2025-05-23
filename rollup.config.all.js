@@ -1,4 +1,4 @@
-import { createRollupConfigEmbed } from "./rollup.createConfig";
+import { createRollupConfigEmbed } from "./rollup.createConfig.js";
 
 export default createRollupConfigEmbed((config) => {
   return {

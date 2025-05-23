@@ -1,13 +1,13 @@
-let isLoadingLibrary = false
+let isLoadingLibrary = false;
 
 /**
  * The list of callbacks, one from each GooglePlacesAutocomplete instance that requested the library before the library
  * had finished loading.
  */
-const callbacks = []
+const callbacks = [];
 
 function hasLoadedLibrary() {
-  return window.google && window.google.maps && window.google.maps.places
+  return window.google && window.google.maps && window.google.maps.places;
 }
 
 /**
@@ -26,34 +26,37 @@ function hasLoadedLibrary() {
  * @param apiKey Your Google Places API Key
  * @param callback A callback (if you want to be notified when the library is available for use)
  */
-export function loadGooglePlacesLibrary(apiKey: string, callback: VoidFunction) {
+export function loadGooglePlacesLibrary(
+  apiKey: string,
+  callback: VoidFunction,
+) {
   if (hasLoadedLibrary()) {
-    callback()
-    return
+    callback();
+    return;
   }
-  
-  callback && callbacks.push(callback)
-  
-  if (isLoadingLibrary) {
-    return
-  }
-  
-  isLoadingLibrary = true
-  
-  const element = document.createElement('script')
-  element.async = true
-  element.defer = true
-  element.onload = onLibraryLoaded
-  element.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places`
-  element.type = 'text/javascript'
 
-  document.head.appendChild(element)
+  callback && callbacks.push(callback);
+
+  if (isLoadingLibrary) {
+    return;
+  }
+
+  isLoadingLibrary = true;
+
+  const element = document.createElement("script");
+  element.async = true;
+  element.defer = true;
+  element.onload = onLibraryLoaded;
+  element.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places`;
+  element.type = "text/javascript";
+
+  document.head.appendChild(element);
 }
 
 function onLibraryLoaded() {
-  isLoadingLibrary = false
-  let callback
-  while (callback = callbacks.pop()) {
-    callback()
+  isLoadingLibrary = false;
+  let callback;
+  while ((callback = callbacks.pop())) {
+    callback();
   }
 }
