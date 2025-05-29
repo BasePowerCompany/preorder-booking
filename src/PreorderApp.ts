@@ -2,6 +2,9 @@ import type { PreorderAppConfig } from "./Config.types";
 import LocationInput from "./location-input/LocationInput.svelte";
 import ZipCodeInput from "./location-input/ZipCodeInput.svelte";
 
+// Track initialization state
+let isZipCodeInitialized = false;
+
 export const PreorderApp = {
   initialize: (props: PreorderAppConfig) => {
     const {
@@ -56,6 +59,12 @@ export const PreorderApp = {
   },
 
   initializeZipCode: (props: PreorderAppConfig) => {
+    // Prevent multiple initializations
+    if (isZipCodeInitialized) {
+      console.warn('ZipCodeInput already initialized, skipping...');
+      return;
+    }
+
     const {
       targetElAddressInput = document.getElementById("zip-code-entry"),
       onAddressSubmitSuccess,
@@ -93,6 +102,9 @@ export const PreorderApp = {
         });
       });
     }
+
+    // Mark as initialized
+    isZipCodeInitialized = true;
 
     return zipCodeInput;
   },

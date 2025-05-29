@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import type { OnAddressSubmitSuccess } from "../types";
   import { displayBlock, displayNone, fadeIn } from "../visibilityUtils";
   import { addressState } from "../windowVars";
@@ -7,24 +7,34 @@
   export let addressCtaText: string = "See if I qualify";
   export let onAddressSubmitSuccess: OnAddressSubmitSuccess = () => {};
 
+  let inputContainer: HTMLElement;
+  let focusOverlay: HTMLElement;
+  let input: HTMLInputElement;
+
+  const handleContainerClick = () => {
+    if (zipCode.length !== 5) {  // Only show overlay if not complete
+      focusOverlay.style.display = "block";
+      inputContainer.classList.add("focused");
+    }
+    input?.focus();
+  };
+
+  const handleOverlayClick = () => {
+    focusOverlay.style.display = "none";
+    inputContainer.classList.remove("focused");
+  };
+
   onMount(() => {
-    const inputContainer = document.querySelector(".input-zip-container") as HTMLElement;
-    const focusOverlay = document.querySelector(".focus_overlay") as HTMLElement;
-    const input = document.querySelector(".zip-search-input") as HTMLInputElement;
-
     if (inputContainer && focusOverlay) {
-      inputContainer.addEventListener("click", () => {
-        if (zipCode.length !== 5) {  // Only show overlay if not complete
-          focusOverlay.style.display = "block";
-          inputContainer.classList.add("focused");
-        }
-        input?.focus();
-      });
+      inputContainer.addEventListener("click", handleContainerClick);
+      focusOverlay.addEventListener("click", handleOverlayClick);
+    }
+  });
 
-      focusOverlay.addEventListener("click", () => {
-        focusOverlay.style.display = "none";
-        inputContainer.classList.remove("focused");
-      });
+  onDestroy(() => {
+    if (inputContainer && focusOverlay) {
+      inputContainer.removeEventListener("click", handleContainerClick);
+      focusOverlay.removeEventListener("click", handleOverlayClick);
     }
   });
 
@@ -84,7 +94,7 @@
 </script>
 
 <div class="input-zip-wrap">
-  <div class="input-zip-container">
+  <div class="input-zip-container" bind:this={inputContainer}>
     <div class="zip-input-layout">
       <input
         type="text"
@@ -92,6 +102,7 @@
         pattern="[0-9]*"
         class="zip-search-input"
         maxlength="5"
+        bind:this={input}
         on:input={handleInput}
         on:keydown={(e) => e.key === 'Enter' && isComplete && handleSubmit()}
       />
@@ -112,7 +123,7 @@
     </button>
   </div>
 </div>
-<div class="focus_overlay"></div>
+<div class="focus_overlay" bind:this={focusOverlay}></div>
 
 <style lang="scss" global>
   .input-zip-wrap {

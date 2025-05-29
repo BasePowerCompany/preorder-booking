@@ -89,7 +89,7 @@
       jQuery(".input-address-container").addClass("focused");
       jQuery("input.location-search-input").attr(
         "placeholder",
-        "Enter your home address",
+        "Enter home address",
       );
       jQuery("button.submitAddressButton").hide();
     });
@@ -116,7 +116,7 @@
     <GooglePlaceAutocomplete
       class="location-search-input"
       apiKey={googlePublicApiKey}
-      placeholder="Enter your home address"
+      placeholder="Enter home address"
       onSelect={(value) => {
         console.log("Place selected:", value);
         const parsed = parsePlaceResult(value);

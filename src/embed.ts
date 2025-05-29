@@ -4,6 +4,7 @@ import { PreorderApp } from "./PreorderApp";
 
 // Initialize ZIP code input when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialize ZIP code input if it exists
   if (document.getElementById("zip-code-entry")) {
     PreorderApp.initializeZipCode({
       targetElAddressInput: document.getElementById("zip-code-entry"),
