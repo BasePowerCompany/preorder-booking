@@ -28,7 +28,7 @@ function hasLoadedLibrary() {
  */
 export function loadGooglePlacesLibrary(
   apiKey: string,
-  callback: VoidFunction,
+  callback: VoidFunction
 ) {
   if (hasLoadedLibrary()) {
     callback();
@@ -47,7 +47,9 @@ export function loadGooglePlacesLibrary(
   element.async = true;
   element.defer = true;
   element.onload = onLibraryLoaded;
-  element.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places`;
+  element.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
+    apiKey
+  )}&libraries=places&language=en`;
   element.type = "text/javascript";
 
   document.head.appendChild(element);

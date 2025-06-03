@@ -1,7 +1,7 @@
 <!-- CSS first -->
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.31/public/preorder-app/bundle.css"
+  href="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.35/public/preorder-app/bundle.css"
 />
 
 <!-- Functionality scripts -->
@@ -13,7 +13,7 @@
   crossorigin
 ></script>
 <script
-  src="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.31/public/preorder-app/embed.js"
+  src="https://cdn.jsdelivr.net/gh/BasePowerCompany/preorder-booking@1.0.35/public/preorder-app/embed.js"
   crossorigin
 ></script>
 
@@ -76,7 +76,7 @@
         var marketStatus = "unavailable";
         try {
           const response = await fetch(
-            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
+            "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
           );
           const csvText = await response.text();
           const lines = csvText.split("\n");
@@ -199,7 +199,7 @@
           var marketStatus = "no";
           try {
             const response = await fetch(
-              "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv",
+              "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv"
             );
             const csvText = await response.text();
             const lines = csvText.split("\n");
@@ -282,7 +282,7 @@
 
         var autocomplete = new google.maps.places.Autocomplete(
           input,
-          autocompleteOptions,
+          autocompleteOptions
         );
 
         autocomplete.setComponentRestrictions({ country: ["us"] });
