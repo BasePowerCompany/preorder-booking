@@ -4,6 +4,7 @@ import ZipCodeInput from "./location-input/ZipCodeInput.svelte";
 
 // Track initialization state
 let isZipCodeInitialized = false;
+let currentZipCodeInstance: any = null;
 
 export const PreorderApp = {
   initialize: (props: PreorderAppConfig) => {
@@ -59,10 +60,10 @@ export const PreorderApp = {
   },
 
   initializeZipCode: (props: PreorderAppConfig) => {
-    // Prevent multiple initializations
-    if (isZipCodeInitialized) {
-      console.warn('ZipCodeInput already initialized, skipping...');
-      return;
+    // Clean up previous instance if it exists
+    if (currentZipCodeInstance) {
+      currentZipCodeInstance.$destroy();
+      currentZipCodeInstance = null;
     }
 
     const {
@@ -75,7 +76,60 @@ export const PreorderApp = {
     const zipCodeInput = new ZipCodeInput({
       target: targetElAddressInput,
       props: {
-        onAddressSubmitSuccess,
+        onAddressSubmitSuccess: async (addressData) => {
+          try {
+            const isLocal = window.location.hostname === "localhost";
+            const csvUrl = isLocal
+              ? "/deregulated-zips.csv"
+              : "https://bpc-web-static-files.s3.us-east-2.amazonaws.com/deregulated-zips.csv";
+            
+            console.log("Fetching CSV from:", csvUrl);
+            const response = await fetch(csvUrl);
+            if (!response.ok) throw new Error("Failed to fetch CSV");
+            
+            const csvText = await response.text();
+            const lines = csvText.split("\n");
+            const zipCode = addressData?.postalCode?.trim()?.substring(0, 5);
+            console.log("Submitted zip code:", zipCode);
+
+            let marketStatus = "no";
+            let found = false;
+            
+            // Skip header row and process each line
+            lines.slice(1).some((line) => {
+              const columns = line.split(",");
+              const csvZip = columns[1]?.trim();
+              const servingNow = columns[4]?.trim();
+              
+              console.log(`Checking zip ${csvZip} against ${zipCode}, serving_now: ${servingNow}`);
+              
+              if (csvZip === zipCode) {
+                found = true;
+                console.log("Found zip in CSV:", columns);
+                if (servingNow === "yes" || servingNow === "houston") {
+                  marketStatus = "yes";
+                  return true;
+                } else if (servingNow === "preorder") {
+                  marketStatus = "preorder";
+                  return true;
+                }
+              }
+              return false;
+            });
+
+            console.log("Market status:", marketStatus, "Found:", found);
+
+            // Call the original success handler with the market status
+            if (typeof onAddressSubmitSuccess === 'function') {
+              onAddressSubmitSuccess(addressData, undefined, { servingNow: marketStatus });
+            }
+          } catch (error) {
+            console.error("Error checking zip code:", error);
+            if (typeof onAddressSubmitSuccess === 'function') {
+              onAddressSubmitSuccess(addressData, undefined, { servingNow: "no" });
+            }
+          }
+        },
         addressCtaText,
       },
     });
@@ -103,7 +157,8 @@ export const PreorderApp = {
       });
     }
 
-    // Mark as initialized
+    // Store the instance for cleanup
+    currentZipCodeInstance = zipCodeInput;
     isZipCodeInitialized = true;
 
     return zipCodeInput;

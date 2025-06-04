@@ -69,7 +69,7 @@
     // Create a minimal address object for consistency with LocationInput
     const minimalAddress = {
       title: "",
-      formattedAddress: zipCode,
+      formattedAddress: "",
       externalId: "",
       externalUrl: "",
       houseNumber: "",
@@ -88,8 +88,12 @@
     addressState.update({
       selectedAddress: minimalAddress
     });
-
-    onAddressSubmitSuccess?.(minimalAddress);
+    
+    if (typeof onAddressSubmitSuccess === 'function') {
+      onAddressSubmitSuccess(minimalAddress);
+    } else {
+      console.error("onAddressSubmitSuccess is not a function:", onAddressSubmitSuccess);
+    }
   };
 </script>
 
@@ -104,7 +108,11 @@
         maxlength="5"
         bind:this={input}
         on:input={handleInput}
-        on:keydown={(e) => e.key === 'Enter' && isComplete && handleSubmit()}
+        on:keydown={(e) => {
+          if (e.key === 'Enter' && isComplete) {
+            handleSubmit();
+          }
+        }}
       />
       <div class="zip-boxes">
         <div class="zip-box" class:filled={zipCode.length >= 1}>{zipCode[0] || ''}</div>
@@ -223,7 +231,7 @@
   .zip-box {
     width: 48px;
     height: 40px;
-    background: #EFF1F2;
+    background: #F0EEEB;
     border-radius: var(--Radius-radius-s, 4px);
     display: flex;
     align-items: center;
