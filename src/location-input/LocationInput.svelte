@@ -157,7 +157,7 @@
     align-self: stretch;
     height: 66px;
     background: #fff;
-    border-radius: 12px;
+    border-radius: var(--Radius-radius-m, 8px);
     position: relative;
     z-index: 551;
     @media screen and (max-width: 768px) {
@@ -180,7 +180,7 @@
     left: 0px;
     right: 0px;
     bottom: 0px;
-    border-radius: 12px;
+    border-radius: var(--Radius-radius-m, 8px);
     border: 1px solid var(--Greyscale-90, #54524F);
   }
   .input-address-container img {
@@ -196,7 +196,7 @@
     justify-content: center;
     align-items: center;
     gap: var(--Spacing-spacing-m, 8px);
-    border-radius: 12px;
+    border-radius: var(--Radius-radius-m, 8px);
     position: absolute;
     right: 9px;
     margin-top: -56px;
@@ -226,7 +226,7 @@
     width: 100%;
     border: none;
     background: none;
-    border-radius: 12px;
+    border-radius: var(--Radius-radius-m, 8px);
     border: none !important;
     outline: none !important;
     font-size: 16px;
@@ -234,7 +234,7 @@
     line-height: 24px;
     padding: 3px 16px 0 48px;
     &.focused {
-      border-radius: 0 0 12px 12px;
+      border-radius: 0 0 var(--Radius-radius-m, 8px) var(--Radius-radius-m, 8px);
     }
   }
   .location-search-input::placeholder {
