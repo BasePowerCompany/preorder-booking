@@ -51,7 +51,6 @@
   }
 
   function handleSubmit() {
-    console.log("handleSubmit called with address:", selectedAddress);
     if (!selectedAddress) {
       errorMessage = "Please enter a full address.";
       return;
@@ -59,7 +58,6 @@
 
     if (!selectedAddress.postalCode || !selectedAddress.houseNumber || !selectedAddress.street) {
       errorMessage = "Please enter a full address.";
-      console.log("Validation failed - missing required fields:", selectedAddress);
       return;
     }
 
@@ -69,7 +67,6 @@
     }
 
     addressState.update({ selectedAddress });
-    console.log("Calling onAddressSubmitSuccess with:", selectedAddress);
     onAddressSubmitSuccess?.(selectedAddress);
   }
 
@@ -118,9 +115,7 @@
       apiKey={googlePublicApiKey}
       placeholder="Enter home address"
       onSelect={(value) => {
-        console.log("Place selected:", value);
         const parsed = parsePlaceResult(value);
-        console.log("Parsed place result:", parsed);
         onAddressSelect?.(parsed);
         window.blur();
         inputErrorMessage = "";

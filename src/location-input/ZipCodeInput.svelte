@@ -7,9 +7,6 @@
   export let addressCtaText: string = "See if I qualify";
   export let onAddressSubmitSuccess: OnAddressSubmitSuccess = () => {};
 
-  // Debug: log the type of onAddressSubmitSuccess on mount
-  $: console.log("ZipCodeInput mounted, onAddressSubmitSuccess type:", typeof onAddressSubmitSuccess);
-
   let inputContainer: HTMLElement;
   let focusOverlay: HTMLElement;
   let input: HTMLInputElement;
@@ -46,7 +43,6 @@
   $: isComplete = zipCode.length === 5;
 
   const handleInput = (event: Event) => {
-    console.log("=== handleInput called ===");
     const input = event.target as HTMLInputElement;
     // Only allow numbers
     const value = input.value.replace(/\D/g, '');
@@ -57,13 +53,9 @@
       input.value = value;
     }
     zipCode = input.value;
-    console.log("Updated zip code:", zipCode);
   };
 
   const handleSubmit = () => {
-    console.log("=== ZipCodeInput handleSubmit called ===");
-    console.log("Current zip code:", zipCode);
-    
     if (!zipCode) {
       inputErrorMessage = "Please enter a zip code.";
       return;
@@ -96,24 +88,13 @@
     addressState.update({
       selectedAddress: minimalAddress
     });
-
-    // Debug: log before calling the callback
-    console.log("About to call onAddressSubmitSuccess with:", minimalAddress);
-    console.log("onAddressSubmitSuccess type:", typeof onAddressSubmitSuccess);
-    console.log("Minimal address object keys:", Object.keys(minimalAddress));
-    console.log("Minimal address object full:", JSON.stringify(minimalAddress, null, 2));
     
     if (typeof onAddressSubmitSuccess === 'function') {
-      console.log("Calling onAddressSubmitSuccess...");
       onAddressSubmitSuccess(minimalAddress);
-      console.log("Received addressData in onAddressSubmitSuccess:", minimalAddress);
     } else {
       console.error("onAddressSubmitSuccess is not a function:", onAddressSubmitSuccess);
     }
   };
-
-  // console.log("Looking for zip code:", zipCode);
-  // console.log("Comparing csvZip:", csvZip, "with input zipCode:", zipCode);
 </script>
 
 <div class="input-zip-wrap">
@@ -128,9 +109,7 @@
         bind:this={input}
         on:input={handleInput}
         on:keydown={(e) => {
-          console.log("Keydown event:", e.key);
           if (e.key === 'Enter' && isComplete) {
-            console.log("Enter key pressed, isComplete:", isComplete);
             handleSubmit();
           }
         }}
@@ -145,10 +124,7 @@
     </div>
     <button 
       class="submitZipButton button secondary w-button" 
-      on:click={() => {
-        console.log("Submit button clicked");
-        handleSubmit();
-      }}
+      on:click={handleSubmit}
       disabled={!isComplete}
     >
       {isComplete ? addressCtaText : "Enter your zip code"}
